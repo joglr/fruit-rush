@@ -45,37 +45,3 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop)
 }
-
-const numbers = [1,2,3,4,5]
-
-numbers.map(square)
-
-function square(x) { 
-    return x * x; 
-
-}
-
-interface GamepadEvent extends Event {
-    gamepad: Gamepad
-}
-
-interface Gamepad {
-    buttons: GamepadButton[]
-    axes: GamepadAxis[],
-    index: Number,
-    id: String
-}
-
-interface GamepadButton {
-
-}
-
-interface GamepadAxis {
-
-}
-
-interface GamepadAxis {
-    
-}interface GamepadAxis {
-    
-}

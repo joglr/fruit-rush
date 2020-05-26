@@ -16,5 +16,5 @@ function setState(newState) {
 }
 
 function getState() {
-  return { ...appstate }
+  return { ...appState }
 }
