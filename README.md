@@ -1,0 +1,7 @@
+# shadows
+
+## Contributing
+
+Compling
+
+Run
