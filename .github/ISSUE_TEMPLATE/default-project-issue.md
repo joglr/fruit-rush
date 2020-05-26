@@ -4,7 +4,7 @@ about: Put newly added issues into default project
 title: ''
 labels: ''
 assignees: ''
-project: Shadows
+projectName: 'Shadows'
 
 ---
 
