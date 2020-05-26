@@ -16,5 +16,4 @@
 
 ### Run
 
-    Open index.html
-
+Serve folder to server
