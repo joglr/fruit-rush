@@ -1,7 +1,10 @@
 // import State from './modules/State'
 // import Gamepad from './modules/Gamepad'
+// import sayhi from './test'
 
 // const state = State()
+
+// sayhi()
 
 const mapConfig = {
     areaSize: 16,
@@ -45,3 +48,4 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop)
 }
+
