@@ -1,8 +1,9 @@
 # 
 
 1. Controller support
-1. Typescript
 1. Koala
+1. Typescript
+1. Move koala
 
 1. Wildfire
 
@@ -10,4 +11,6 @@
 
 1. OpenGL
 
-2. MULTIPLAYER
+1. MULTIPLAYER
+
+1. Ray tracing
