@@ -1,7 +1,7 @@
-import State from './modules/State.mjs'
-import Gamepad from './modules/Gamepad.mjs'
+// import State from './modules/State'
+// import Gamepad from './modules/Gamepad'
 
-const state = State()
+// const state = State()
 
 const mapConfig = {
     areaSize: 16,
