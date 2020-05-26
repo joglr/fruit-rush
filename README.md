@@ -2,6 +2,19 @@
 
 ## Contributing
 
-Compling
+### Install dependencies
 
-Run
+    npm install
+
+### Compiling
+
+    npm run build
+
+#### for watch mode
+
+    npm start
+
+### Run
+
+    Open index.html
+
