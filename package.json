@@ -8,6 +8,8 @@
   },
   "devDependencies": {},
   "scripts": {
+    "build": "tsc index.ts",
+    "dev": "tsc index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
