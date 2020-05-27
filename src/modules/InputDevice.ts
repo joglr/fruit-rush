@@ -21,12 +21,12 @@ export class GamepadInput implements InputDevice {
 const downKeys = {}
 
 export class KeyboardInput implements InputDevice {
-  xPos: string[]
-  xNeg: string[]
-  yPos: string[]
-  yNeg: string[]
+  xPos: string
+  xNeg: string
+  yPos: string
+  yNeg: string
 
-  constructor(xPos: string[], xNeg: string[], yPos: string[], yNeg: string[]) {
+  constructor(xPos: string, xNeg: string, yPos: string, yNeg: string) {
     this.xPos = xPos
     this.xNeg = xNeg
     this.yPos = yPos

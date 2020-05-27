@@ -11,7 +11,7 @@ import init, {
 init(activateKeyboardPlayer)
 
 function activateKeyboardPlayer() {
-  inputDevice = new KeyboardInput(['d'], ['a'], ['s'], ['w'])
+  inputDevice = new KeyboardInput('d', 'a', 's', 'w')
 }
 
 const mapConfig = {
