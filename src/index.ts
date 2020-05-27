@@ -12,6 +12,7 @@ init(activateKeyboardPlayer)
 
 function activateKeyboardPlayer() {
   inputDevice = new KeyboardInput('d', 'a', 's', 'w')
+  // inputDevice = new KeyboardInput('left', 'right', 'down', 'up')
 }
 
 const mapConfig = {
@@ -24,60 +25,32 @@ const playerIcon = '🐨'
 const gameContainer = document.querySelector('#game')
 const infoContainer = document.querySelector('#info')
 let lastAnimationFrameID
-let gamepadIndex = null
-let inputDevice: InputDevice
+let inputDevice: InputDevice = null
 
 const playerElement = document.createElement('div')
 playerElement.textContent = playerIcon
 
 gameContainer.appendChild(playerElement)
 
-// setInterval(() => {
-//     if (gamepadIndex !== null) {
-//         navigator.getGamepads()[gamepadIndex].hapticActuators
-//     }
-// }, 1000)
-
 window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
-  gamepadIndex = e.gamepad.index
+  inputDevice = new GamepadInput(e.gamepad.index)
+  lastAnimationFrameID = requestAnimationFrame(gameLoop)
+})
 
-  console.log(
-    'Gamepad connected at index %d: %s. %d buttons, %d axes.',
-    e.gamepad.index,
-    e.gamepad.id,
-    e.gamepad.buttons.length,
-    e.gamepad.axes.length
-  )
-
+window.addEventListener('keydown', () => {
+  activateKeyboardPlayer()
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
 })
 
 window.addEventListener('gamepaddisconnected', (e: GamepadEvent) => {
+  inputDevice = null
   cancelAnimationFrame(lastAnimationFrameID)
 })
 
 function gameLoop() {
-  // infoContainer.textContent = navigator.getGamepads()[gamepadIndex].timestamp.toString()
-
-  infoContainer.textContent = navigator.getGamepads()[0].axes.toString()
-
-  let leftStickX = navigator.getGamepads()[0].axes[0]
-  let leftStickY = navigator.getGamepads()[0].axes[1]
-  let rightStickX = navigator.getGamepads()[0].axes[2]
-  let rightStickY = navigator.getGamepads()[0].axes[3]
-
-  infoContainer.innerHTML = `
-    <div>leftStickX = ${leftStickX}</div>
-    <div>leftStickY = ${leftStickY}</div>
-    <div>rightStickX = ${rightStickX}</div>
-    <div>rightStickY = ${rightStickY}</div>
-
-    `
-
-  updateGameState(navigator.getGamepads()[0])
-
+  infoContainer.textContent = inputDevice.getMovementVector().toString()
+  updateGameState(inputDevice)
   render()
-
   requestAnimationFrame(gameLoop)
 }
 
@@ -89,10 +62,9 @@ function render() {
 
 // Game state
 
-function updateGameState(gamepad: Gamepad) {
-  let leftStickX = navigator.getGamepads()[0].axes[0]
-  let leftStickY = navigator.getGamepads()[0].axes[1]
-  movePlayerRelatively(leftStickX, leftStickY)
+function updateGameState(inputDevice: InputDevice) {
+  const v: [number, number] = inputDevice.getMovementVector()
+  movePlayerRelatively(v[0], v[1])
 }
 
 let playerPosition: [number, number]

@@ -10,7 +10,15 @@ export interface InputDevice {
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
   getMovementVector(): [number, number] {
-    throw new Error('Method not implemented.')
+    return [
+      navigator.getGamepads()[this.gamepadIndex].axes[0],
+      navigator.getGamepads()[this.gamepadIndex].axes[1],
+    ]
+  }
+
+  vibrate() {
+    throw new Error('Method not implemented yet')
+    // navigator.getGamepads()[this.gamepadIndex].hapticActuators[0].pulse()
   }
 
   constructor(gamepadIndex) {
@@ -18,9 +26,12 @@ export class GamepadInput implements InputDevice {
   }
 }
 
-const downKeys = {}
-
 export class KeyboardInput implements InputDevice {
+  static downKeys = {}
+  static keyIsDown(key: string) {
+    return Object.keys(KeyboardInput.downKeys).includes(key)
+  }
+
   xPos: string
   xNeg: string
   yPos: string
@@ -33,20 +44,22 @@ export class KeyboardInput implements InputDevice {
     this.yNeg = yNeg
   }
 
-  getMovementVector() : [number, number] {
+  getMovementVector(): [number, number] {
     return [
-      (Object.keys(downKeys).includes(xPos) ? 1 : 0) + (Object.keys(downKeys)].includes(xNeg) ? -1 : 0),
-      (Object.keys(downKeys).includes(yPos) ? 1 : 0) + (Object.keys(downKeys)].includes(yNeg) ? -1 : 0)
+      (KeyboardInput.keyIsDown(this.xPos) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.xNeg) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.yPos) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.yNeg) ? -1 : 0),
     ]
   }
 }
 
 export default function init(callback: Function) {
   window.addEventListener('keydown', (evt) => {
-    downKeys[evt.key.toLowerCase()] = true
+    KeyboardInput.downKeys[evt.key.toLowerCase()] = true
     callback()
   })
   window.addEventListener('keyup', (evt) => {
-    delete downKeys[evt.key.toLowerCase()]
+    delete KeyboardInput.downKeys[evt.key.toLowerCase()]
   })
 }
