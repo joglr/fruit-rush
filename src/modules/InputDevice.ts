@@ -7,6 +7,8 @@ export interface InputDevice {
   getMovementVector()
 }
 
+let initialized = false
+
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
   getMovementVector(): [number, number] {
@@ -38,6 +40,10 @@ export class KeyboardInput implements InputDevice {
   yNeg: string
 
   constructor(xPos: string, xNeg: string, yPos: string, yNeg: string) {
+    if (!initialized)
+      throw new Error(
+        'Cannot construct KeyboardInput before init has been called'
+      )
     this.xPos = xPos
     this.xNeg = xNeg
     this.yPos = yPos
@@ -55,6 +61,7 @@ export class KeyboardInput implements InputDevice {
 }
 
 export default function init(callback: Function) {
+  initialized = true
   window.addEventListener('keydown', (evt) => {
     KeyboardInput.downKeys[evt.key.toLowerCase()] = true
     callback()
