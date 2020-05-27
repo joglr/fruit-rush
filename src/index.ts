@@ -69,6 +69,14 @@ function render() {
 
 function updateGameState(inputDevice: InputDevice) {
   const v: [number, number] = inputDevice.getMovementVector()
+  const ball = document.createElement('div')
+  ball.style.transform = `translate(${playerPosition[0]}px,${playerPosition[1]}px)`
+  ball.style.borderRadius = '50%'
+  ball.style.width = '10px'
+  ball.style.height = '10px'
+  ball.style.position = 'absolute'
+  ball.style.backgroundColor = 'white'
+  document.body.appendChild(ball)
   movePlayerRelatively(v[0], v[1])
 }
 
