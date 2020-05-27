@@ -63,10 +63,12 @@ export class KeyboardInput implements InputDevice {
 export default function init(callback: Function) {
   initialized = true
   window.addEventListener('keydown', (evt) => {
+    evt.preventDefault()
     KeyboardInput.downKeys[evt.key.toLowerCase()] = true
     callback()
   })
   window.addEventListener('keyup', (evt) => {
+    evt.preventDefault()
     delete KeyboardInput.downKeys[evt.key.toLowerCase()]
   })
 }
