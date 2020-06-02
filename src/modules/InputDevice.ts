@@ -32,32 +32,32 @@ export class GamepadInput implements InputDevice {
 
 export class KeyboardInput implements InputDevice {
   static downKeys = new Map()
-  static keyIsDown(key: string): boolean {
-    return Boolean(KeyboardInput.downKeys.get(key))
+  static keyIsDown(keys: string[]): boolean {
+    return keys.some((key) => Boolean(KeyboardInput.downKeys.get(key)))
   }
 
-  xPosKey: string
-  xNegKey: string
-  yPosKey: string
-  yNegKey: string
+  xPosKeys: string[]
+  xNegKeys: string[]
+  yPosKeys: string[]
+  yNegKeys: string[]
 
-  constructor(xPos: string, xNeg: string, yPos: string, yNeg: string) {
+  constructor(xPos: string[], xNeg: string[], yPos: string[], yNeg: string[]) {
     if (!initialized)
       throw new Error(
         'Cannot construct KeyboardInput before init has been called'
       )
-    this.xPosKey = xPos
-    this.xNegKey = xNeg
-    this.yPosKey = yPos
-    this.yNegKey = yNeg
+    this.xPosKeys = xPos
+    this.xNegKeys = xNeg
+    this.yPosKeys = yPos
+    this.yNegKeys = yNeg
   }
 
   getMovementVector(): [number, number] {
     return [
-      (KeyboardInput.keyIsDown(this.xPosKey) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.xNegKey) ? -1 : 0),
-      (KeyboardInput.keyIsDown(this.yPosKey) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.yNegKey) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.xPosKeys) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.xNegKeys) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.yPosKeys) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0),
     ]
   }
 }

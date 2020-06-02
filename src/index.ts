@@ -141,7 +141,12 @@ function createPlayerElement() {
 }
 
 function activateKeyboardPlayer() {
-  const inputDevice = new KeyboardInput('d', 'a', 's', 'w')
+  const inputDevice = new KeyboardInput(
+    ['arrowright', 'd'],
+    ['arrowleft', 'a'],
+    ['arrowdown', 's'],
+    ['arrowup', 'w']
+  )
   const playerElement = createPlayerElement()
   //@ts-ignore
   gameContainer.appendChild(playerElement)
