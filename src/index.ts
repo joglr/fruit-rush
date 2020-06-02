@@ -7,6 +7,7 @@ import init, {
   InputDevice,
   GamepadInput,
 } from './modules/InputDevice.js'
+import { Player } from './modules/Player.js'
 
 init()
 
@@ -16,7 +17,6 @@ const mapConfig = {
   imageSize: 12,
 }
 
-const playerIcon = '🐨'
 const gameContainer = document.querySelector('#game')
 const infoContainer = document.querySelector('#info')
 let lastAnimationFrameID
@@ -63,7 +63,11 @@ function gameLoop(timeStamp: number) {
   for (const p of players) {
     const mv = p.getInputDevice().getMovementVector().toString()
     //@ts-ignore
-    infoContainer.textContent += '\n' + `p${players.indexOf(p) + 1}: ${mv}`
+    infoContainer.innerHTML +=
+      '\n' +
+      `<span style="filter: ${Player.createFilter(p.getHue())}">${
+        Player.playerIcon
+      }: ${mv}</span>`
   }
   updateGameState()
   render()
@@ -102,44 +106,9 @@ let players: Player[] = []
 
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
-class Player {
-  private inputDevice: InputDevice
-  private position: [number, number]
-  private DOMElement: HTMLElement
-
-  constructor(inputDevice: InputDevice, domElement: HTMLElement) {
-    this.inputDevice = inputDevice
-    this.position = [0, 0]
-    this.DOMElement = domElement
-  }
-
-  getInputDevice() {
-    return this.inputDevice
-  }
-
-  getPosition(): [number, number] {
-    return this.position
-  }
-
-  getDOMElement(): HTMLElement {
-    return this.DOMElement
-  }
-
-  setPosition(position: [number, number]) {
-    this.position = position
-  }
-}
-
-function createPlayerElement() {
-  const playerElement = document.createElement('div')
-  playerElement.textContent = playerIcon
-  playerElement.style.display = 'inline-block'
-  return playerElement
-}
-
 function createPlayer(inputDevice: InputDevice) {
-  const playerElement = createPlayerElement()
+  const player = new Player(inputDevice)
   //@ts-ignore
-  gameContainer.appendChild(playerElement)
-  players.push(new Player(inputDevice, playerElement))
+  gameContainer.appendChild(player.getDOMElement())
+  players.push(player)
 }

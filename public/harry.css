@@ -28,3 +28,7 @@ body {
   position: absolute;
   top: 0;
 }
+
+.player {
+  display: inline-block;
+}
