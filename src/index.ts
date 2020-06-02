@@ -65,7 +65,7 @@ function gameLoop(timeStamp: number) {
     //@ts-ignore
     infoContainer.innerHTML +=
       '\n' +
-      `<span style="filter: ${Player.createFilter(p.getHue())}">${
+      `<span style="filter: ${Player.createFilter(p.getHue(), 300)}">${
         Player.playerIcon
       }: ${mv}</span>`
   }

@@ -9,8 +9,8 @@ export class Player {
   }
   static playerIcon = '🐨'
 
-  static createFilter(hue: number): string {
-    return `sepia(150%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
+  static createFilter(hue: number, sepia: number = 150): string {
+    return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
   }
 
   private inputDevice: InputDevice
