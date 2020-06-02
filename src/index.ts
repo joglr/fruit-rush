@@ -8,6 +8,8 @@ import init, {
   GamepadInput,
 } from './modules/InputDevice.js'
 import { Player } from './modules/Player.js'
+import { Positionable } from './modules/Positionable.js'
+import { Fire } from './modules/Fire.js'
 
 init()
 
@@ -54,6 +56,14 @@ window.addEventListener('gamepaddisconnected', (e: GamepadEvent) => {
   }
 })
 
+window.addEventListener('click', (e) => {
+  const W = window.innerWidth
+  const H = window.innerHeight
+  const fire = new Fire([e.pageX - W / 2, e.pageY - H / 2])
+  gameContainer?.appendChild(fire.getDOMElement())
+  positionables.add(fire)
+})
+
 let lastFrameTime: number
 
 function gameLoop(timeStamp: number) {
@@ -87,11 +97,11 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 function render() {
   const W = window.innerWidth
   const H = window.innerHeight
-  for (const player of players) {
-    const pos = player.getPosition()
+  for (const p of positionables) {
+    const pos = p.getPosition()
     const x = W / 2 + pos[0]
     const y = H / 2 + pos[1]
-    player.getDOMElement().style.transform = `translate(${x}px,${y}px)`
+    p.getDOMElement().style.transform = `translate(${x}px,${y}px)`
   }
 }
 
@@ -107,12 +117,13 @@ function updateGameState() {
 
 // let players: Player[] = []
 const players: Set<Player> = new Set()
+const positionables: Set<Positionable> = new Set()
 
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function createPlayer(inputDevice: InputDevice) {
   const player = new Player(inputDevice)
-  //@ts-ignore
-  gameContainer.appendChild(player.getDOMElement())
+  gameContainer?.appendChild(player.getDOMElement())
   players.add(player)
+  positionables.add(player)
 }

@@ -20,15 +20,14 @@ body {
 }
 
 #info {
+  position: absolute;
+  top: 0;
   font-family: Consolas, 'Courier New', Courier, monospace;
   white-space: pre-wrap;
 }
 
-.game div {
+.positionable {
   position: absolute;
   top: 0;
-}
-
-.player {
   display: inline-block;
 }

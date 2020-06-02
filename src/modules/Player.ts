@@ -1,6 +1,7 @@
 import { InputDevice } from './InputDevice.js'
+import { Positionable } from './Positionable.js'
 
-export class Player {
+export class Player implements Positionable {
   private static currentHue = 0
   private static genHue(): number {
     const hue = this.currentHue
@@ -16,13 +17,16 @@ export class Player {
   private inputDevice: InputDevice
   private position: [number, number]
   private hue: number
-  private DOMElement: HTMLElement
+  private DOMElement: HTMLDivElement
 
   constructor(inputDevice: InputDevice) {
     this.inputDevice = inputDevice
     this.position = [0, 0]
     this.hue = Player.genHue()
-    this.DOMElement = createPlayerElement(this.hue)
+    this.DOMElement = document.createElement('div')
+    this.DOMElement.textContent = Player.playerIcon
+    this.DOMElement.classList.add('positionable')
+    this.DOMElement.style.filter = Player.createFilter(this.hue)
   }
   getInputDevice() {
     return this.inputDevice
@@ -33,18 +37,10 @@ export class Player {
   getHue(): number {
     return this.hue
   }
-  getDOMElement(): HTMLElement {
+  getDOMElement(): HTMLDivElement {
     return this.DOMElement
   }
   setPosition(position: [number, number]) {
     this.position = position
   }
-}
-
-function createPlayerElement(hue: number) {
-  const playerElement = document.createElement('div')
-  playerElement.textContent = Player.playerIcon
-  playerElement.classList.add('player')
-  playerElement.style.filter = Player.createFilter(hue)
-  return playerElement
 }
