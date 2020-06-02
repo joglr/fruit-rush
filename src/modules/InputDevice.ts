@@ -4,7 +4,7 @@
 // }
 
 export interface InputDevice {
-  getMovementVector()
+  getMovementVector(): [number, number]
 }
 
 let initialized = false
@@ -12,10 +12,12 @@ let initialized = false
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
   getMovementVector(): [number, number] {
-    return [
-      navigator.getGamepads()[this.gamepadIndex].axes[0],
-      navigator.getGamepads()[this.gamepadIndex].axes[1],
-    ]
+    const gp = navigator.getGamepads()[this.gamepadIndex]
+    // @ts-ignore
+    const x = gp.axes[0]
+    // @ts-ignore
+    const y = gp.axes[1]
+    return [normalizeToDeadZone(x), normalizeToDeadZone(y)]
   }
 
   vibrate() {
@@ -23,52 +25,69 @@ export class GamepadInput implements InputDevice {
     // navigator.getGamepads()[this.gamepadIndex].hapticActuators[0].pulse()
   }
 
-  constructor(gamepadIndex) {
+  constructor(gamepadIndex: number) {
     this.gamepadIndex = gamepadIndex
   }
 }
 
 export class KeyboardInput implements InputDevice {
-  static downKeys = {}
-  static keyIsDown(key: string) {
-    return Object.keys(KeyboardInput.downKeys).includes(key)
+  static downKeys = new Map()
+  static keyIsDown(key: string): boolean {
+    return Boolean(KeyboardInput.downKeys.get(key))
   }
 
-  xPos: string
-  xNeg: string
-  yPos: string
-  yNeg: string
+  xPosKey: string
+  xNegKey: string
+  yPosKey: string
+  yNegKey: string
 
   constructor(xPos: string, xNeg: string, yPos: string, yNeg: string) {
     if (!initialized)
       throw new Error(
         'Cannot construct KeyboardInput before init has been called'
       )
-    this.xPos = xPos
-    this.xNeg = xNeg
-    this.yPos = yPos
-    this.yNeg = yNeg
+    this.xPosKey = xPos
+    this.xNegKey = xNeg
+    this.yPosKey = yPos
+    this.yNegKey = yNeg
   }
 
   getMovementVector(): [number, number] {
     return [
-      (KeyboardInput.keyIsDown(this.xPos) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.xNeg) ? -1 : 0),
-      (KeyboardInput.keyIsDown(this.yPos) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.yNeg) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.xPosKey) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.xNegKey) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.yPosKey) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.yNegKey) ? -1 : 0),
     ]
   }
 }
 
-export default function init(callback: Function) {
+export default function init(callback?: Function) {
   initialized = true
   window.addEventListener('keydown', (evt) => {
-    evt.preventDefault()
-    KeyboardInput.downKeys[evt.key.toLowerCase()] = true
-    callback()
+    // evt.preventDefault()
+    KeyboardInput.downKeys.set(evt.key.toLowerCase(), true)
+    if (callback) callback()
   })
   window.addEventListener('keyup', (evt) => {
-    evt.preventDefault()
-    delete KeyboardInput.downKeys[evt.key.toLowerCase()]
+    // evt.preventDefault()
+    KeyboardInput.downKeys.delete(evt.key.toLowerCase())
   })
+}
+
+const DEAD_ZONE_THRESHOLD = 0.01
+
+function normalizeToDeadZone(input: number): number {
+  const sign = input < 0 ? -1 : 1
+  let magnitude = Math.abs(input)
+
+  if (
+    magnitude - DEAD_ZONE_THRESHOLD <
+    0
+    // && magnitude + DEAD_ZONE_THRESHOLD > -DEAD_ZONE_THRESHOLD
+  )
+    return (magnitude = 0)
+  if (input + DEAD_ZONE_THRESHOLD > 1) magnitude = 1
+
+  return sign * magnitude
 }

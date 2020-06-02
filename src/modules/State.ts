@@ -1,17 +1,15 @@
 const api = {
   setState,
-  getState
+  getState,
 }
 
-let appState = {
-
-}
+let appState = {}
 
 export default function init() {
   return api
 }
 
-function setState(newState) {
+function setState(newState: object) {
   appState = newState
 }
 
