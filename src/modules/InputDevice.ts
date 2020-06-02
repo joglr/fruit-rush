@@ -20,6 +20,10 @@ export class GamepadInput implements InputDevice {
     return [normalizeToDeadZone(x), normalizeToDeadZone(y)]
   }
 
+  getGamepadIndex() {
+    return this.gamepadIndex
+  }
+
   vibrate() {
     throw new Error('Method not implemented yet')
     // navigator.getGamepads()[this.gamepadIndex].hapticActuators[0].pulse()

@@ -44,9 +44,12 @@ window.addEventListener('keydown', () => {
 
 // @ts-ignore
 window.addEventListener('gamepaddisconnected', (e: GamepadEvent) => {
+  // TODO: Test this with non-steam controller
   for (const p of players) {
-    if (p.getInputDevice()) {
-      //
+    const gp = p.getInputDevice() as GamepadInput
+    if (gp.getGamepadIndex() === e.gamepad.index) {
+      p.getDOMElement().remove()
+      players.delete(p)
     }
   }
 })
@@ -102,7 +105,8 @@ function updateGameState() {
   }
 }
 
-let players: Player[] = []
+// let players: Player[] = []
+const players: Set<Player> = new Set()
 
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
@@ -110,5 +114,5 @@ function createPlayer(inputDevice: InputDevice) {
   const player = new Player(inputDevice)
   //@ts-ignore
   gameContainer.appendChild(player.getDOMElement())
-  players.push(player)
+  players.add(player)
 }
