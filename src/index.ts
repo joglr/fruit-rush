@@ -63,8 +63,7 @@ function gameLoop(timeStamp: number) {
   for (const p of players) {
     const mv = p.getInputDevice().getMovementVector().toString()
     //@ts-ignore
-    infoContainer.textContent += `
-p${players.indexOf(p) + 1}: ${mv}`
+    infoContainer.textContent += '\n' + `p${players.indexOf(p) + 1}: ${mv}`
   }
   updateGameState()
   render()
@@ -79,9 +78,13 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 // Render
 
 function render() {
+  const W = window.innerWidth
+  const H = window.innerHeight
   for (const player of players) {
     const pos = player.getPosition()
-    player.getDOMElement().style.transform = `translate(${pos[0]}px,${pos[1]}px)`
+    const x = W / 2 + pos[0]
+    const y = H / 2 + pos[1]
+    player.getDOMElement().style.transform = `translate(${x}px,${y}px)`
   }
 }
 
