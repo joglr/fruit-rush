@@ -85,19 +85,10 @@ function render() {
 // Game state
 
 function updateGameState() {
-  // const ball = document.createElement('div')
-  // ball.style.transform = `translate(${playerPosition[0]}px,${playerPosition[1]}px)`
-  // ball.style.borderRadius = '50%'
-  // ball.style.width = '10px'
-  // ball.style.height = '10px'
-  // ball.style.position = 'absolute'
-  // ball.style.backgroundColor = 'white'
-  // document.body.appendChild(ball)
   for (const player of players) {
     const pos = player.getPosition()
     const v: [number, number] = player.getInputDevice().getMovementVector()
     player.setPosition([pos[0] + v[0], pos[1] + v[1]])
-    // movePlayerRelatively(v[0] * 3, v[1] * 3)
   }
 }
 
@@ -151,10 +142,4 @@ function activateKeyboardPlayer() {
   //@ts-ignore
   gameContainer.appendChild(playerElement)
   players.push(new Player(inputDevice, playerElement))
-  // inputDevice = new KeyboardInput(
-  //   'arrowright',
-  //   'arrowleft',
-  //   'arrowdown',
-  //   'arrowup'
-  // )
 }
