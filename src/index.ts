@@ -24,17 +24,21 @@ let lastAnimationFrameID
 
 // @ts-ignore
 window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
-  console.log('new player')
   const inputDevice = new GamepadInput(e.gamepad.index)
-  const playerElement = createPlayerElement()
-  //@ts-ignore
-  gameContainer.appendChild(playerElement)
-  players.push(new Player(inputDevice, playerElement))
+  createPlayer(inputDevice)
 })
 
 let keyboardPlayerActive: boolean = false
 window.addEventListener('keydown', () => {
-  if (!keyboardPlayerActive) activateKeyboardPlayer()
+  if (!keyboardPlayerActive) {
+    const inputDevice = new KeyboardInput(
+      ['arrowright', 'd'],
+      ['arrowleft', 'a'],
+      ['arrowdown', 's'],
+      ['arrowup', 'w']
+    )
+    createPlayer(inputDevice)
+  }
   keyboardPlayerActive = true
 })
 
@@ -57,9 +61,10 @@ function gameLoop(timeStamp: number) {
   ).toFixed()}`
 
   for (const p of players) {
+    const mv = p.getInputDevice().getMovementVector().toString()
     //@ts-ignore
     infoContainer.textContent += `
-p${players.indexOf(p)}: ${p.getInputDevice().getMovementVector().toString()}`
+p${players.indexOf(p) + 1}: ${mv}`
   }
   updateGameState()
   render()
@@ -129,13 +134,7 @@ function createPlayerElement() {
   return playerElement
 }
 
-function activateKeyboardPlayer() {
-  const inputDevice = new KeyboardInput(
-    ['arrowright', 'd'],
-    ['arrowleft', 'a'],
-    ['arrowdown', 's'],
-    ['arrowup', 'w']
-  )
+function createPlayer(inputDevice: InputDevice) {
   const playerElement = createPlayerElement()
   //@ts-ignore
   gameContainer.appendChild(playerElement)

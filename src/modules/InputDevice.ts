@@ -75,7 +75,7 @@ export default function init(callback?: Function) {
   })
 }
 
-const DEAD_ZONE_THRESHOLD = 0.01
+const DEAD_ZONE_THRESHOLD = 0.5
 
 function normalizeToDeadZone(input: number): number {
   const sign = input < 0 ? -1 : 1
@@ -86,7 +86,7 @@ function normalizeToDeadZone(input: number): number {
     0
     // && magnitude + DEAD_ZONE_THRESHOLD > -DEAD_ZONE_THRESHOLD
   )
-    return (magnitude = 0)
+    magnitude = 0
   if (input + DEAD_ZONE_THRESHOLD > 1) magnitude = 1
 
   return sign * magnitude
