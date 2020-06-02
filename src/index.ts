@@ -59,9 +59,7 @@ function gameLoop(timeStamp: number) {
   for (const p of players) {
     //@ts-ignore
     infoContainer.textContent += `
-    p${players.indexOf(
-      p
-    )}: ${p.getInputDevice().getMovementVector().toString()}`
+p${players.indexOf(p)}: ${p.getInputDevice().getMovementVector().toString()}`
   }
   updateGameState()
   render()
