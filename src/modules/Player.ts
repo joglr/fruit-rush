@@ -9,6 +9,7 @@ export class Player implements Positionable {
     return hue
   }
   static playerIcon = '🐨'
+  static fireIcon = '🔥'
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
@@ -18,6 +19,7 @@ export class Player implements Positionable {
   private position: [number, number]
   private hue: number
   private DOMElement: HTMLDivElement
+  private health: number = 100
 
   constructor(inputDevice: InputDevice) {
     this.inputDevice = inputDevice
@@ -40,6 +42,10 @@ export class Player implements Positionable {
   getDOMElement(): HTMLDivElement {
     return this.DOMElement
   }
+  getDimensions(): [number, number] {
+    return [22, 22]
+  }
+
   setPosition(position: [number, number]) {
     this.position = position
   }

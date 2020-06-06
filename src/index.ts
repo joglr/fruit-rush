@@ -75,12 +75,15 @@ function gameLoop(timeStamp: number) {
 
   for (const p of players) {
     const mv = p.getInputDevice().getMovementVector().toString()
+    const pp = p.getPosition().toString()
     //@ts-ignore
     infoContainer.innerHTML +=
       '\n' +
-      `<span style="filter: ${Player.createFilter(p.getHue(), 300)}">${
+      `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${
         Player.playerIcon
-      }: ${mv}</span>`
+      }
+  ${mv}
+  ${pp}</div>`
   }
   updateGameState()
   render()
@@ -102,6 +105,9 @@ function render() {
     const x = W / 2 + pos[0]
     const y = H / 2 + pos[1]
     p.getDOMElement().style.transform = `translate(${x}px,${y}px)`
+  }
+  for (const p of players) {
+    p.getDOMElement().textContent = Player.playerIcon
   }
 }
 
