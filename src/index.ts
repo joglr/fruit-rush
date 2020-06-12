@@ -10,6 +10,7 @@ import init, {
 import { Player } from './modules/Player.js'
 import { Positionable } from './modules/Positionable.js'
 import { Fire } from './modules/Fire.js'
+import { Updateable } from './modules/Updateable.js'
 
 init()
 
@@ -37,7 +38,8 @@ window.addEventListener('keydown', () => {
       ['arrowright', 'd'],
       ['arrowleft', 'a'],
       ['arrowdown', 's'],
-      ['arrowup', 'w']
+      ['arrowup', 'w'],
+      ['space', ' ']
     )
     createPlayer(inputDevice)
   }
@@ -85,7 +87,7 @@ function gameLoop(timeStamp: number) {
   ${mv}
   ${pp}</div>`
   }
-  updateGameState()
+  updateGameState(timeStamp)
   render()
   requestAnimationFrame(gameLoop)
   lastFrameTime = timeStamp
@@ -113,17 +115,28 @@ function render() {
 
 // Game state
 
-function updateGameState() {
+function updateGameState(timeStamp: number) {
   for (const player of players) {
     const pos = player.getPosition()
     const v: [number, number] = player.getInputDevice().getMovementVector()
     player.setPosition([pos[0] + v[0], pos[1] + v[1]])
+
+    if (player.getInputDevice().getActionButtonIsDown() && Math.floor(timeStamp * Math.floor(calcFPS(lastFrameTime, timeStamp))) % 10 === 0) {
+      const thing = player.getActionEquipable().use(player)
+      positionables.add(thing)
+      updatables.add(thing)
+      gameContainer?.appendChild(thing.getDOMElement())
+    }
+  }
+  for (const updateable of updatables) {
+    updateable.update()
   }
 }
 
 // let players: Player[] = []
 const players: Set<Player> = new Set()
 const positionables: Set<Positionable> = new Set()
+const updatables: Set<Updateable> = new Set()
 
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 

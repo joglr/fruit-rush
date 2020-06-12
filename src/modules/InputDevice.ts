@@ -5,6 +5,7 @@
 
 export interface InputDevice {
   getMovementVector(): [number, number]
+  getActionButtonIsDown(): boolean
 }
 
 let initialized = false
@@ -32,6 +33,9 @@ export class GamepadInput implements InputDevice {
   constructor(gamepadIndex: number) {
     this.gamepadIndex = gamepadIndex
   }
+  getActionButtonIsDown(): boolean {
+    return navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
+  }
 }
 
 export class KeyboardInput implements InputDevice {
@@ -44,8 +48,9 @@ export class KeyboardInput implements InputDevice {
   xNegKeys: string[]
   yPosKeys: string[]
   yNegKeys: string[]
+  actionKey: string[]
 
-  constructor(xPos: string[], xNeg: string[], yPos: string[], yNeg: string[]) {
+  constructor(xPos: string[], xNeg: string[], yPos: string[], yNeg: string[], actionKey: string[]) {
     if (!initialized)
       throw new Error(
         'Cannot construct KeyboardInput before init has been called'
@@ -54,6 +59,10 @@ export class KeyboardInput implements InputDevice {
     this.xNegKeys = xNeg
     this.yPosKeys = yPos
     this.yNegKeys = yNeg
+    this.actionKey = actionKey
+  }
+  getActionButtonIsDown(): boolean {
+    return KeyboardInput.keyIsDown(this.actionKey)
   }
 
   getMovementVector(): [number, number] {
