@@ -12,7 +12,7 @@ import { Positionable } from './modules/Positionable.js'
 import { Fire } from './modules/Fire.js'
 import { Updateable } from './modules/Updateable.js'
 
-init()
+init() 
 
 const mapConfig = {
   areaSize: 16,
@@ -87,6 +87,14 @@ function gameLoop(timeStamp: number) {
   ${mv}
   ${pp}</div>`
   }
+  for (const u of updateables) {
+    //@ts-ignore
+    infoContainer.innerHTML += 
+    "\n" + 
+    `
+      ${u.getPosition()}
+    `
+  }
   updateGameState(timeStamp)
   render()
   requestAnimationFrame(gameLoop)
@@ -124,19 +132,31 @@ function updateGameState(timeStamp: number) {
     if (player.getInputDevice().getActionButtonIsDown() && Math.floor(timeStamp * Math.floor(calcFPS(lastFrameTime, timeStamp))) % 10 === 0) {
       const thing = player.getActionEquipable().use(player)
       positionables.add(thing)
-      updatables.add(thing)
+      updateables.add(thing)
       gameContainer?.appendChild(thing.getDOMElement())
     }
   }
-  for (const updateable of updatables) {
+  
+  const W = window.innerWidth
+  const H = window.innerHeight
+  
+  for (const updateable of updateables) {
     updateable.update()
+    const [x,y] = updateable.getPosition()
+    if (
+      x < -W / 2 || x > W/2 || 
+      y < -H / 2 || y > H/2) {
+        positionables.delete(updateable)
+        updateables.delete(updateable)
+        updateable.getDOMElement().remove()
+      }
   }
 }
 
 // let players: Player[] = []
 const players: Set<Player> = new Set()
 const positionables: Set<Positionable> = new Set()
-const updatables: Set<Updateable> = new Set()
+const updateables: Set<Updateable> = new Set()
 
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
