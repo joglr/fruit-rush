@@ -2,7 +2,7 @@ import { InputDevice } from './InputDevice.js'
 import { Positionable } from './Positionable.js'
 import { WaterGun } from './Equipables/WaterGun.js'
 
-export class Player implements Positionable {
+export class Player extends Positionable {
   private static currentHue = 0
   private static genHue(): number {
     const hue = this.currentHue
@@ -17,14 +17,13 @@ export class Player implements Positionable {
   }
 
   private inputDevice: InputDevice
-  private position: [number, number] = [0,0]
   private hue = Player.genHue()
-  private DOMElement = document.createElement('div')
 
   private health: number = 100
   private actionEquipable = new WaterGun()
 
   constructor(inputDevice: InputDevice) {
+    super([0,0])
     this.inputDevice = inputDevice
     this.DOMElement.textContent = Player.playerIcon
     this.DOMElement.classList.add('positionable')
@@ -33,23 +32,13 @@ export class Player implements Positionable {
   getInputDevice() {
     return this.inputDevice
   }
-  getPosition(): [number, number] {
-    return this.position
-  }
   getActionEquipable() {
     return this.actionEquipable
   }
   getHue(): number {
     return this.hue
   }
-  getDOMElement(): HTMLDivElement {
-    return this.DOMElement
-  }
   getDimensions(): [number, number] {
     return [22, 22]
-  }
-
-  setPosition(position: [number, number]) {
-    this.position = position
   }
 }

@@ -1,7 +1,7 @@
-import { Player } from "../Player";
-import { Positionable } from "../Positionable";
-import { Equipable } from "../Equipable";
-import { Updateable } from "../Updateable";
+import { Player } from "../Player.js";
+import { Positionable } from "../Positionable.js";
+import { Equipable } from "../Equipable.js";
+import { Updateable } from "../Updateable.js";
 
 export class WaterGun implements Equipable {
   use(player: Player): Updateable {
@@ -9,28 +9,18 @@ export class WaterGun implements Equipable {
   }
 }
 
-class Water implements Positionable, Updateable {
-  private position: [number, number]
+export class Water extends Positionable implements Updateable {
+
   private velocity: [number, number] = [0,0]
-  private DOMElement = document.createElement('div')
 
   constructor(position: [number, number], velocity: [number, number]) {
-    this.position = position
+    super(position)
     this.velocity = velocity
-    this.DOMElement.textContent = '💦'
-    this.DOMElement.classList.add('positionable')
+    super.getDOMElement().textContent = '💦'
   }
 
   update() {
     this.position[0] += this.velocity[0]
     this.position[1] += this.velocity[1]
   }
-
-  getPosition(): [number, number] {
-    return this.position
-  }
-  getDOMElement(): HTMLDivElement {
-    return this.DOMElement
-  }
-
 }
