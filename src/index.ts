@@ -72,11 +72,9 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
     cancelAnimationFrame(lastAnimationFrameID)
     document.title += pausedText
-    console.log('hidden')
   } else {
     requestAnimationFrame(gameLoop)
     document.title = document.title.replace(pausedText, '')
-    console.log('not hidden')
   }
 });
 
