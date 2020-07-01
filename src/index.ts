@@ -11,8 +11,9 @@ import { Player } from './modules/Player.js'
 import { Positionable } from './modules/Positionable.js'
 import { Fire } from './modules/Fire.js'
 import { Updateable } from './modules/Updateable.js'
-
-init() 
+import { randBetween } from './modules/util.js'
+import { Tree } from './modules/Tree.js'
+import { Water } from './modules/Equipables/WaterGun.js'
 
 const mapConfig = {
   areaSize: 16,
@@ -22,7 +23,7 @@ const mapConfig = {
 
 const gameContainer = document.querySelector('#game')
 const infoContainer = document.querySelector('#info')
-let lastAnimationFrameID : number
+let lastAnimationFrameID: number
 // let inputDevice: InputDevice
 
 // @ts-ignore
@@ -94,16 +95,16 @@ function gameLoop(timeStamp: number) {
     infoContainer.innerHTML +=
       '\n' +
       `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${
-        Player.playerIcon
+      Player.playerIcon
       }
   ${mv}
   ${pp}</div>`
   }
   for (const u of updateables) {
     //@ts-ignore
-    infoContainer.innerHTML += 
-    "\n" + 
-    `
+    infoContainer.innerHTML +=
+      "\n" +
+      `
       ${u.getPosition()}
     `
   }
@@ -148,21 +149,37 @@ function updateGameState(timeStamp: number) {
       gameContainer?.appendChild(thing.getDOMElement())
     }
   }
-  
+
   const W = window.innerWidth
   const H = window.innerHeight
-  
+
   for (const updateable of updateables) {
     updateable.update()
-    const [x,y] = updateable.getPosition()
+    const [x, y] = updateable.getPosition()
     if (
-      x < -W / 2 || x > W/2 || 
-      y < -H / 2 || y > H/2) {
-        const delFromPos = positionables.delete(updateable)
-        const delFromUpds = updateables.delete(updateable)
-        updateable.getDOMElement().remove()
-        if (!delFromPos || !delFromUpds) console.log('Unable to remove unreachable updateable')
+      x < -W / 2 || x > W / 2 ||
+      y < -H / 2 || y > H / 2) {
+      const delFromPos = positionables.delete(updateable)
+      const delFromUpds = updateables.delete(updateable)
+      updateable.getDOMElement().remove()
+      if (!delFromPos || !delFromUpds) console.log('Unable to remove unreachable updateable')
+    }
+  }
+  for (const p of positionables) {
+    for (const op of positionables) {
+      if (p instanceof Water) {
+        if (op instanceof Fire) {
+          if (p.intersectsWith(op)) {
+            positionables.delete(p)
+            positionables.delete(op)
+            p.getDOMElement().remove()
+            op.getDOMElement().remove()
+            updateables.delete(p)
+            break
+          }
+        }
       }
+    }
   }
 }
 
@@ -171,6 +188,9 @@ const players: Set<Player> = new Set()
 const positionables: Set<Positionable> = new Set()
 const updateables: Set<Updateable> = new Set()
 
+
+init()
+generateMap()
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function createPlayer(inputDevice: InputDevice) {
@@ -178,4 +198,29 @@ function createPlayer(inputDevice: InputDevice) {
   gameContainer?.appendChild(player.getDOMElement())
   players.add(player)
   positionables.add(player)
+}
+
+function generateMap() {
+  let fireCount = 1
+  let treeCount = 0
+
+  const W = window.innerWidth
+  const H = window.innerHeight
+
+  for (let i = 0; i < fireCount; i++) {
+    const x = randBetween(-W / 2, W / 2)
+    const y = randBetween(-W / 2, W / 2)
+    const fire = new Fire([x, y])
+    positionables.add(fire)
+    gameContainer?.appendChild(fire.getDOMElement())
+  }
+
+  for (let i = 0; i < treeCount; i++) {
+    const x = randBetween(-W / 2, W / 2)
+    const y = randBetween(-W / 2, W / 2)
+    const tree = new Tree([x, y])
+    positionables.add(tree)
+    gameContainer?.appendChild(tree.getDOMElement())
+  }
+
 }
