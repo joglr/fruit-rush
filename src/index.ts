@@ -22,7 +22,7 @@ const mapConfig = {
 
 const gameContainer = document.querySelector('#game')
 const infoContainer = document.querySelector('#info')
-let lastAnimationFrameID
+let lastAnimationFrameID : number
 // let inputDevice: InputDevice
 
 // @ts-ignore
@@ -66,6 +66,20 @@ window.addEventListener('click', (e) => {
   positionables.add(fire)
 })
 
+const pausedText = ' (Paused)'
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    cancelAnimationFrame(lastAnimationFrameID)
+    document.title += pausedText
+    console.log('hidden')
+  } else {
+    requestAnimationFrame(gameLoop)
+    document.title = document.title.replace(pausedText, '')
+    console.log('not hidden')
+  }
+});
+
 let lastFrameTime: number
 
 function gameLoop(timeStamp: number) {
@@ -97,7 +111,7 @@ function gameLoop(timeStamp: number) {
   }
   updateGameState(timeStamp)
   render()
-  requestAnimationFrame(gameLoop)
+  lastAnimationFrameID = requestAnimationFrame(gameLoop)
   lastFrameTime = timeStamp
 }
 
@@ -146,9 +160,10 @@ function updateGameState(timeStamp: number) {
     if (
       x < -W / 2 || x > W/2 || 
       y < -H / 2 || y > H/2) {
-        positionables.delete(updateable)
-        updateables.delete(updateable)
+        const delFromPos = positionables.delete(updateable)
+        const delFromUpds = updateables.delete(updateable)
         updateable.getDOMElement().remove()
+        if (!delFromPos || !delFromUpds) console.log('Unable to remove unreachable updateable')
       }
   }
 }
