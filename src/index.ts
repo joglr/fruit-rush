@@ -167,23 +167,21 @@ function updateGameState(timeStamp: number) {
   }
   for (const p of positionables) {
     for (const op of positionables) {
-      if (p instanceof Water) {
-        if (op instanceof Fire) {
-          if (p.intersectsWith(op)) {
-            positionables.delete(p)
-            positionables.delete(op)
-            p.getDOMElement().remove()
-            op.getDOMElement().remove()
-            updateables.delete(p)
-            break
-          }
+      if (p instanceof Water && op instanceof Fire) {
+        // Extinguish fire with water if they intersect
+        if (p.intersectsWith(op)) {
+          positionables.delete(p)
+          positionables.delete(op)
+          p.getDOMElement().remove()
+          op.getDOMElement().remove()
+          updateables.delete(p)
+          break
         }
       }
     }
   }
 }
 
-// let players: Player[] = []
 const players: Set<Player> = new Set()
 const positionables: Set<Positionable> = new Set()
 const updateables: Set<Updateable> = new Set()
