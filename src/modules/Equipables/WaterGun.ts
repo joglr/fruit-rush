@@ -11,7 +11,7 @@ export class WaterGun extends Equipable {
 
   use(player: Player, currentTime: number): Updateable {
     this.setLastUsed(currentTime)
-    const pv = player.getInputDevice().getMovementVector()
+    const pv = player.getInputDevice().getAimVector()
     const wv = pv.multiply(2)
     return new Water(player.getPosition(), wv.getComponents())
   }

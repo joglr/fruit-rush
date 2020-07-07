@@ -7,6 +7,7 @@ import { Vector2 } from "./util.js"
 
 export interface InputDevice {
   getMovementVector(): Vector2
+  getAimVector(): Vector2
   getActionButtonIsDown(): boolean
 }
 
@@ -28,15 +29,23 @@ export class GamepadInput implements InputDevice {
   }
 
   vibrate() {
-    throw new Error('Method not implemented yet')
-    // navigator.getGamepads()[this.gamepadIndex].hapticActuators[0].pulse()
+    // throw new Error('Method not implemented yet')
+    navigator?.getGamepads()[this.gamepadIndex]?.hapticActuators[0].pulse(1, 100)
   }
 
   constructor(gamepadIndex: number) {
     this.gamepadIndex = gamepadIndex
   }
+  getAimVector(): Vector2 {
+    const gp = navigator.getGamepads()[this.gamepadIndex]
+    // @ts-ignore
+    const x = gp.axes[2]
+    // @ts-ignore
+    const y = gp.axes[3]
+    return new Vector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
+  }
   getActionButtonIsDown(): boolean {
-    return navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
+    return navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true
   }
 }
 
@@ -50,17 +59,28 @@ export class KeyboardInput implements InputDevice {
   xNegKeys: string[]
   yPosKeys: string[]
   yNegKeys: string[]
+  xPosAimKeys: string[]
+  xNegAimKeys: string[]
+  yPosAimKeys: string[]
+  yNegAimKeys: string[]
   actionKey: string[]
 
-  constructor(xPos: string[], xNeg: string[], yPos: string[], yNeg: string[], actionKey: string[]) {
+  constructor(
+    xPos: string[], xNeg: string[], yPos: string[], yNeg: string[], 
+    xPosAim: string[], xNegAim: string[], yPosAim: string[], yNegAim: string[], 
+    actionKey: string[]) {
     if (!initialized)
       throw new Error(
-        'Cannot construct KeyboardInput before init has been called'
+        'Cannot construct KeyboardInput before init has been called'  
       )
     this.xPosKeys = xPos
     this.xNegKeys = xNeg
     this.yPosKeys = yPos
     this.yNegKeys = yNeg
+    this.xPosAimKeys = xPosAim
+    this.xNegAimKeys = xNegAim
+    this.yPosAimKeys = yPosAim
+    this.yNegAimKeys = yNegAim
     this.actionKey = actionKey
   }
   getActionButtonIsDown(): boolean {
@@ -73,6 +93,14 @@ export class KeyboardInput implements InputDevice {
         (KeyboardInput.keyIsDown(this.xNegKeys) ? -1 : 0),
       (KeyboardInput.keyIsDown(this.yPosKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0),
+    )
+  }
+  getAimVector(): Vector2 {
+    return new Vector2(
+      (KeyboardInput.keyIsDown(this.xPosAimKeys) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.xNegAimKeys) ? -1 : 0),
+      (KeyboardInput.keyIsDown(this.yPosAimKeys) ? 1 : 0) +
+        (KeyboardInput.keyIsDown(this.yNegAimKeys) ? -1 : 0),
     )
   }
 }

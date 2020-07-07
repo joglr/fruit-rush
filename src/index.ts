@@ -36,11 +36,15 @@ let keyboardPlayerActive: boolean = false
 window.addEventListener('keydown', () => {
   if (!keyboardPlayerActive) {
     const inputDevice = new KeyboardInput(
-      ['arrowright', 'd'],
-      ['arrowleft', 'a'],
-      ['arrowdown', 's'],
-      ['arrowup', 'w'],
-      ['space', ' ']
+      ['d'],
+      ['a'],
+      ['s'],
+      ['w'],
+      ['arrowright'],
+      ['arrowleft'],
+      ['arrowdown'],
+      ['arrowup'],
+      ['space', ' '],
     )
     createPlayer(inputDevice)
   }
@@ -132,10 +136,10 @@ function updateGameState(timeStamp: number) {
   for (const player of players) {
     const pos = player.getPosition()
     const v: [number, number] = player.getInputDevice().getMovementVector().getComponents()
-    const positivev: [number, number] = player.getInputDevice().getMovementVector().toPositiveVector().getComponents()
+    const positiveAimVector: [number, number] = player.getInputDevice().getAimVector().toPositiveVector().getComponents()
     player.setPosition([pos[0] + v[0], pos[1] + v[1]])
 
-    if (player.getInputDevice().getActionButtonIsDown() && (positivev[0] > 0 || positivev[1] > 0)) {
+    if (player.getInputDevice().getActionButtonIsDown() && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)) {
 
       if (player.getActionEquipable().canUse(timeStamp)) {
         const thing = player.getActionEquipable().use(player, timeStamp)
