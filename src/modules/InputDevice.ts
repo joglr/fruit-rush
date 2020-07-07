@@ -8,6 +8,7 @@ import { Vector2 } from "./util.js"
 export interface InputDevice {
   getMovementVector(): Vector2
   getAimVector(): Vector2
+  hapticFeedback(): void
   getActionButtonIsDown(): boolean
 }
 
@@ -28,13 +29,11 @@ export class GamepadInput implements InputDevice {
     return this.gamepadIndex
   }
 
-  vibrate() {
-    // throw new Error('Method not implemented yet')
-    navigator?.getGamepads()[this.gamepadIndex]?.hapticActuators[0].pulse(1, 100)
-  }
-
   constructor(gamepadIndex: number) {
     this.gamepadIndex = gamepadIndex
+  }
+  hapticFeedback(): void {
+    navigator?.getGamepads()[this.gamepadIndex]?.hapticActuators[0].pulse(1, 100)
   }
   getAimVector(): Vector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
@@ -83,6 +82,9 @@ export class KeyboardInput implements InputDevice {
     this.yNegAimKeys = yNegAim
     this.actionKey = actionKey
   }
+  hapticFeedback(): void {
+    // No haptic feedback for keyboard users...
+  }
   getActionButtonIsDown(): boolean {
     return KeyboardInput.keyIsDown(this.actionKey)
   }
@@ -119,7 +121,7 @@ export default function init(callback?: Function) {
 }
 
 // Use the value 0.5 to make moving with a controller comparable to using arrow keys
-const DEAD_ZONE_THRESHOLD = 0.05
+const DEAD_ZONE_THRESHOLD = 0.1
 
 function normalizeToDeadZone(input: number): number {
   const sign = input < 0 ? -1 : 1

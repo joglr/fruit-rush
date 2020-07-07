@@ -11,7 +11,7 @@ import { Player } from './modules/Player.js'
 import { Positionable } from './modules/Positionable.js'
 import { Fire } from './modules/Fire.js'
 import { Updateable } from './modules/Updateable.js'
-import { randBetween } from './modules/util.js'
+import { randBetween, Vector2 } from './modules/util.js'
 import { Tree } from './modules/Tree.js'
 import { Water } from './modules/Equipables/WaterGun.js'
 
@@ -90,10 +90,24 @@ function gameLoop(timeStamp: number) {
   infoContainer.textContent = `fps ${calcFPS(
     lastFrameTime,
     timeStamp
-  ).toFixed()}`
+  ).toFixed()} (${Math.round(timeStamp)})`
+
+  const flooredTimeStamp = Math.round(timeStamp)
+
+  // Interval events
+  if (flooredTimeStamp % 100 === 0 && positionables.size < 400) {
+    
+    const [W, H] = getWH()
+
+    const [x,y] = generateRandomPos(W,H).getComponents()
+    const fire = new Fire([x, y])
+    positionables.add(fire)
+    gameContainer?.appendChild(fire.getDOMElement())
+  }
 
   for (const p of players) {
     const mv = p.getInputDevice().getMovementVector().getComponents().toString()
+    const av = p.getInputDevice().getAimVector().getComponents().toString()
     const pp = p.getPosition().toString()
     //@ts-ignore
     infoContainer.innerHTML +=
@@ -102,11 +116,15 @@ function gameLoop(timeStamp: number) {
       Player.playerIcon
       }
   ${mv}
+  ${av}
   ${pp}</div>`
   }
   //@ts-ignore
   infoContainer.innerHTML += `
 Updateables: ${updateables.size}`
+  //@ts-ignore
+  infoContainer.innerHTML += `
+Positionables: ${positionables.size}`
   updateGameState(timeStamp)
   render()
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
@@ -120,8 +138,9 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 // Render
 
 function render() {
-  const W = window.innerWidth
-  const H = window.innerHeight
+  
+  const [W, H] = getWH()
+
   for (const p of positionables) {
     const pos = p.getPosition()
     const x = W / 2 + pos[0]
@@ -203,23 +222,30 @@ function generateMap() {
   let fireCount = 50
   let treeCount = 200
 
-  const W = window.innerWidth
-  const H = window.innerHeight
+  const [W, H] = getWH()
 
   for (let i = 0; i < fireCount; i++) {
-    const x = randBetween(-W / 2, W / 2)
-    const y = randBetween(-W / 2, W / 2)
+    const [x,y] = generateRandomPos(W,H).getComponents()
     const fire = new Fire([x, y])
     positionables.add(fire)
     gameContainer?.appendChild(fire.getDOMElement())
   }
 
   for (let i = 0; i < treeCount; i++) {
-    const x = randBetween(-W / 2, W / 2)
-    const y = randBetween(-W / 2, W / 2)
+    const [x,y] = generateRandomPos(W,H).getComponents()
     const tree = new Tree([x, y])
     positionables.add(tree)
     gameContainer?.appendChild(tree.getDOMElement())
   }
 
+}
+
+function generateRandomPos(maxX: number, maxY: number) {
+  const x = randBetween(-maxX / 2, maxX / 2)
+  const y = randBetween(-maxY / 2, maxY / 2)
+  return new Vector2(x,y)
+}
+
+function getWH() {
+  return  [window.innerWidth, window.innerHeight]
 }
