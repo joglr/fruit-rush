@@ -90,7 +90,8 @@ export default function init(callback?: Function) {
   })
 }
 
-const DEAD_ZONE_THRESHOLD = 0.5
+// Use the value 0.5 to make moving with a controller comparable to using arrow keys
+const DEAD_ZONE_THRESHOLD = 0.05
 
 function normalizeToDeadZone(input: number): number {
   const sign = input < 0 ? -1 : 1
