@@ -100,14 +100,9 @@ function gameLoop(timeStamp: number) {
   ${mv}
   ${pp}</div>`
   }
-  for (const u of updateables) {
-    //@ts-ignore
-    infoContainer.innerHTML +=
-      "\n" +
-      `
-      ${u.getPosition()}
-    `
-  }
+  //@ts-ignore
+  infoContainer.innerHTML += `
+Updateables: ${updateables.size}`
   updateGameState(timeStamp)
   render()
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
