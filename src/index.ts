@@ -124,9 +124,6 @@ function render() {
     const y = H / 2 + pos[1]
     p.getDOMElement().style.transform = `translate(${x}px,${y}px)`
   }
-  for (const p of players) {
-    p.getDOMElement().textContent = Player.playerIcon
-  }
 }
 
 // Game state
@@ -134,14 +131,18 @@ function render() {
 function updateGameState(timeStamp: number) {
   for (const player of players) {
     const pos = player.getPosition()
-    const v: [number, number] = player.getInputDevice().getMovementVector()
+    const v: [number, number] = player.getInputDevice().getMovementVector().getComponents()
     player.setPosition([pos[0] + v[0], pos[1] + v[1]])
 
-    if (player.getInputDevice().getActionButtonIsDown() && Math.floor(timeStamp * Math.floor(calcFPS(lastFrameTime, timeStamp))) % 10 === 0) {
-      const thing = player.getActionEquipable().use(player)
-      positionables.add(thing)
-      updateables.add(thing)
-      gameContainer?.appendChild(thing.getDOMElement())
+    if (player.getInputDevice().getActionButtonIsDown() && (v[0] > 0 || v[1] > 0)) {
+
+      if (player.getActionEquipable().canUse(timeStamp)) {
+        const thing = player.getActionEquipable().use(player, timeStamp)
+        positionables.add(thing)
+        updateables.add(thing)
+        gameContainer?.appendChild(thing.getDOMElement())
+
+      }
     }
   }
 
@@ -194,8 +195,8 @@ function createPlayer(inputDevice: InputDevice) {
 }
 
 function generateMap() {
-  let fireCount = 1
-  let treeCount = 0
+  let fireCount = 50
+  let treeCount = 200
 
   const W = window.innerWidth
   const H = window.innerHeight

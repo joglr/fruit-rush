@@ -3,9 +3,17 @@ import { Positionable } from "../Positionable.js";
 import { Equipable } from "../Equipable.js";
 import { Updateable } from "../Updateable.js";
 
-export class WaterGun implements Equipable {
-  use(player: Player): Updateable {
-    return new Water(player.getPosition(), player.getInputDevice().getMovementVector())
+export class WaterGun extends Equipable {
+
+  constructor(repeatRate : number) {
+    super(repeatRate)
+  }
+
+  use(player: Player, currentTime: number): Updateable {
+    this.setLastUsed(currentTime)
+    const pv = player.getInputDevice().getMovementVector()
+    const wv = pv.multiply(2)
+    return new Water(player.getPosition(), wv.getComponents())
   }
 }
 

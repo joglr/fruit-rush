@@ -3,8 +3,10 @@
 //   KEYBOARD
 // }
 
+import { Vector2 } from "./util.js"
+
 export interface InputDevice {
-  getMovementVector(): [number, number]
+  getMovementVector(): Vector2
   getActionButtonIsDown(): boolean
 }
 
@@ -12,13 +14,13 @@ let initialized = false
 
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
-  getMovementVector(): [number, number] {
+  getMovementVector(): Vector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
     // @ts-ignore
     const x = gp.axes[0]
     // @ts-ignore
     const y = gp.axes[1]
-    return [normalizeToDeadZone(x), normalizeToDeadZone(y)]
+    return new Vector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
 
   getGamepadIndex() {
@@ -65,13 +67,13 @@ export class KeyboardInput implements InputDevice {
     return KeyboardInput.keyIsDown(this.actionKey)
   }
 
-  getMovementVector(): [number, number] {
-    return [
+  getMovementVector(): Vector2 {
+    return new Vector2(
       (KeyboardInput.keyIsDown(this.xPosKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.xNegKeys) ? -1 : 0),
       (KeyboardInput.keyIsDown(this.yPosKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0),
-    ]
+    )
   }
 }
 
