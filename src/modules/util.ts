@@ -14,6 +14,9 @@ export class Vector2 {
     let [x, y] = this.getComponents().map(c => c / size)
     return new Vector2(x, y)
   }
+  toPositiveVector(): Vector2 {
+    return Vector2.fromArray(this.getComponents().map(Math.abs))
+  }
 
   getComponents(): [number, number] {
     return this.components
@@ -35,7 +38,7 @@ export class Vector2 {
     return sizeSquared
   }
 
-  static fromArray([x, y]: [number, number]) {
+  static fromArray([x, y]: number[]) {
     return new Vector2(x, y)
   }
 

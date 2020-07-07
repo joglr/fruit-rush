@@ -89,7 +89,7 @@ function gameLoop(timeStamp: number) {
   ).toFixed()}`
 
   for (const p of players) {
-    const mv = p.getInputDevice().getMovementVector().toString()
+    const mv = p.getInputDevice().getMovementVector().getComponents().toString()
     const pp = p.getPosition().toString()
     //@ts-ignore
     infoContainer.innerHTML +=
@@ -132,9 +132,10 @@ function updateGameState(timeStamp: number) {
   for (const player of players) {
     const pos = player.getPosition()
     const v: [number, number] = player.getInputDevice().getMovementVector().getComponents()
+    const positivev: [number, number] = player.getInputDevice().getMovementVector().toPositiveVector().getComponents()
     player.setPosition([pos[0] + v[0], pos[1] + v[1]])
 
-    if (player.getInputDevice().getActionButtonIsDown() && (v[0] > 0 || v[1] > 0)) {
+    if (player.getInputDevice().getActionButtonIsDown() && (positivev[0] > 0 || positivev[1] > 0)) {
 
       if (player.getActionEquipable().canUse(timeStamp)) {
         const thing = player.getActionEquipable().use(player, timeStamp)
