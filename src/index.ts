@@ -161,6 +161,7 @@ function updateGameState(timeStamp: number) {
     if (player.getInputDevice().getActionButtonIsDown() && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)) {
 
       if (player.getActionEquipable().canUse(timeStamp)) {
+        player.getInputDevice().hapticFeedback()
         const thing = player.getActionEquipable().use(player, timeStamp)
         positionables.add(thing)
         updateables.add(thing)

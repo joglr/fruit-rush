@@ -33,7 +33,16 @@ export class GamepadInput implements InputDevice {
     this.gamepadIndex = gamepadIndex
   }
   hapticFeedback(): void {
-    navigator?.getGamepads()[this.gamepadIndex]?.hapticActuators[0].pulse(1, 100)
+    const gamepads = navigator?.getGamepads()
+    debugger
+    // @ts-ignore
+    gamepads[this.gamepadIndex]?.vibrationActuator.playEffect("dual-rumble", {
+      startDelay: 0,
+      duration: 100,
+      weakMagnitude: 1,
+      strongMagnitude: 1
+    })
+    
   }
   getAimVector(): Vector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
