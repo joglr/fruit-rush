@@ -20,7 +20,7 @@ export class Player extends Positionable {
   private hue = Player.genHue()
 
   private health: number = 100
-  private actionEquipable = new WaterGun(100)
+  private actionEquipable = new WaterGun(300)
 
   constructor(inputDevice: InputDevice) {
     super([0,0])
