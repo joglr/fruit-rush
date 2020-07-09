@@ -1,7 +1,9 @@
+import { POSITIONABLE_SIZE } from "./settings.js";
+
 export abstract class Positionable {
 
   protected position: [number, number] = [0, 0];
-  protected dimensions: [number, number] = [22, 22];
+  protected dimensions: [number, number] = [POSITIONABLE_SIZE, POSITIONABLE_SIZE];
   protected DOMElement: HTMLDivElement = document.createElement('div');
 
   constructor(position: [number, number]) {

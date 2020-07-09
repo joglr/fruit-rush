@@ -43,3 +43,7 @@ export class Vector2 {
   }
 
 }
+
+export function pick(items: any[]) {
+  return items[Math.floor(Math.random() * items.length)]
+}

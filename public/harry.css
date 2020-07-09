@@ -1,12 +1,17 @@
 /**
  * Reset
  */
+ 
 *,
 *:before,
 *:after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+:root {
+  --positionableSize: 22px;
 }
 
 html {
@@ -31,4 +36,5 @@ body {
   position: absolute;
   top: 0;
   display: inline-block;
+  font-size: var(--positionableSize)
 }
