@@ -9,7 +9,8 @@ export interface InputDevice {
   getMovementVector(): Vector2
   getAimVector(): Vector2
   hapticFeedback(): void
-  getActionButtonIsDown(): boolean
+  getPrimaryActionButtonIsDown(): boolean
+  getSecondaryActionButtonIsDown(): boolean
 }
 
 let initialized = false
@@ -42,7 +43,7 @@ export class GamepadInput implements InputDevice {
       weakMagnitude: 1,
       strongMagnitude: 1
     })
-    
+
   }
   getAimVector(): Vector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
@@ -52,8 +53,11 @@ export class GamepadInput implements InputDevice {
     const y = gp.axes[3]
     return new Vector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
-  getActionButtonIsDown(): boolean {
+  getPrimaryActionButtonIsDown(): boolean {
     return navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true
+  }
+  getSecondaryActionButtonIsDown(): boolean {
+    return navigator.getGamepads()[this.gamepadIndex]?.buttons[6].pressed === true
   }
 }
 
@@ -71,15 +75,18 @@ export class KeyboardInput implements InputDevice {
   xNegAimKeys: string[]
   yPosAimKeys: string[]
   yNegAimKeys: string[]
-  actionKey: string[]
+  primaryActionKey: string[]
+  secondaryActionKey: string[]
 
   constructor(
-    xPos: string[], xNeg: string[], yPos: string[], yNeg: string[], 
-    xPosAim: string[], xNegAim: string[], yPosAim: string[], yNegAim: string[], 
-    actionKey: string[]) {
+    xPos: string[], xNeg: string[], yPos: string[], yNeg: string[],
+    xPosAim: string[], xNegAim: string[], yPosAim: string[], yNegAim: string[],
+    primaryActionKey: string[],
+    secondaryActionKey: string[],
+    ) {
     if (!initialized)
       throw new Error(
-        'Cannot construct KeyboardInput before init has been called'  
+        'Cannot construct KeyboardInput before init has been called'
       )
     this.xPosKeys = xPos
     this.xNegKeys = xNeg
@@ -89,13 +96,17 @@ export class KeyboardInput implements InputDevice {
     this.xNegAimKeys = xNegAim
     this.yPosAimKeys = yPosAim
     this.yNegAimKeys = yNegAim
-    this.actionKey = actionKey
+    this.primaryActionKey = primaryActionKey
+    this.secondaryActionKey = secondaryActionKey
   }
   hapticFeedback(): void {
     // No haptic feedback for keyboard users...
   }
-  getActionButtonIsDown(): boolean {
-    return KeyboardInput.keyIsDown(this.actionKey)
+  getPrimaryActionButtonIsDown(): boolean {
+    return KeyboardInput.keyIsDown(this.primaryActionKey)
+  }
+  getSecondaryActionButtonIsDown(): boolean {
+    return KeyboardInput.keyIsDown(this.secondaryActionKey)
   }
 
   getMovementVector(): Vector2 {

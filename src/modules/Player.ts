@@ -1,7 +1,7 @@
 import { InputDevice } from './InputDevice.js'
 import { Positionable } from './Positionable.js'
 import { WaterGun } from './Equipables/WaterGun.js'
-import { POSITIONABLE_SIZE } from './settings.js'
+import { NotAFlameThrower } from './Equipables/NotAFlameThrower.js'
 
 export class Player extends Positionable {
 
@@ -17,14 +17,15 @@ export class Player extends Positionable {
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
-  } 
+  }
 
   private inputDevice: InputDevice
   private hue = Player.genHue()
 
   private health: number = Player.initialHealth
   private isOnFire: boolean = false
-  private actionEquipable = new WaterGun(300)
+  private primaryActionEquipable = new WaterGun(2000)
+  private secondaryActionEquipable = new NotAFlameThrower(2000)
 
   constructor(inputDevice: InputDevice) {
     super([0,0])
@@ -36,8 +37,11 @@ export class Player extends Positionable {
   getInputDevice() {
     return this.inputDevice
   }
-  getActionEquipable() {
-    return this.actionEquipable
+  getPrimaryActionEquipable() {
+    return this.primaryActionEquipable
+  }
+  getSecondaryActionEquipable() {
+    return this.secondaryActionEquipable
   }
   getHue(): number {
     return this.hue
@@ -45,21 +49,21 @@ export class Player extends Positionable {
 
 
   setOnFire() {
-    this.isOnFire = true 
+    this.isOnFire = true
   }
 
   extinguish() {
     this.isOnFire = false
   }
-  
+
   getIsOnFire() {
-    return this.isOnFire 
+    return this.isOnFire
   }
 
   getHealth() {
     return this.health
   }
-  
+
   heal(amount: number) {
     this.health = Math.min(this.health + amount, Player.initialHealth)
   }

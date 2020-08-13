@@ -9,13 +9,13 @@ import init, {
 } from "./modules/InputDevice.js";
 import { Player } from "./modules/Player.js";
 import { Positionable } from "./modules/Positionable.js";
-import { Fire } from "./modules/Fire.js";
 import { Updateable } from "./modules/Updateable.js";
 import { randBetween, Vector2 } from "./modules/util.js";
 import { Tree } from "./modules/Tree.js";
 import { Water } from "./modules/Equipables/WaterGun.js";
 import { Eucalyptus } from "./modules/Eucalyptus.js";
 import { POSITIONABLE_SIZE } from "./modules/settings.js";
+import { Fire } from "./modules/Equipables/NotAFlameThrower.js";
 
 document.documentElement.style.setProperty('--positionableSize', `${POSITIONABLE_SIZE}px`)
 
@@ -48,7 +48,8 @@ window.addEventListener("keydown", () => {
       ["arrowleft"],
       ["arrowdown"],
       ["arrowup"],
-      ["space", " "]
+      ["v"],
+      ["c"]
     );
     createPlayer(inputDevice);
   }
@@ -106,13 +107,12 @@ function gameLoop(timeStamp: number) {
     const fire = new Fire([x, y]);
     positionables.add(fire);
     gameContainer?.appendChild(fire.getDOMElement());
-    
-    
+
     [x, y] = generateRandomPos(W, H).getComponents();
     const water = new Water([x, y], [0,0]);
     positionables.add(water);
     gameContainer?.appendChild(water.getDOMElement());
-    
+
     [x, y] = generateRandomPos(W, H).getComponents();
     const eucalyptus = new Eucalyptus([x, y]);
     positionables.add(eucalyptus);
@@ -213,17 +213,31 @@ function updateGameState(timeStamp: number) {
     }
 
     if (
-      player.getInputDevice().getActionButtonIsDown() &&
+      player.getInputDevice().getPrimaryActionButtonIsDown() &&
       (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
     ) {
-      if (player.getActionEquipable().canUse(timeStamp)) {
+      if (player.getPrimaryActionEquipable().canUse(timeStamp)) {
         player.getInputDevice().hapticFeedback();
-        const thing = player.getActionEquipable().use(player, timeStamp);
+        const thing = player.getPrimaryActionEquipable().use(player, timeStamp);
         positionables.add(thing);
         updateables.add(thing);
         gameContainer?.appendChild(thing.getDOMElement());
       }
     }
+
+    if (
+      player.getInputDevice().getSecondaryActionButtonIsDown() &&
+      (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+    ) {
+      if (player.getSecondaryActionEquipable().canUse(timeStamp)) {
+        player.getInputDevice().hapticFeedback();
+        const thing = player.getSecondaryActionEquipable().use(player, timeStamp);
+        positionables.add(thing);
+        updateables.add(thing);
+        gameContainer?.appendChild(thing.getDOMElement());
+      }
+    }
+
   }
 
   const W = window.innerWidth;

@@ -1,7 +1,7 @@
 /**
  * Reset
  */
- 
+
 *,
 *:before,
 *:after {
@@ -30,6 +30,8 @@ body {
   top: 0;
   font-family: Consolas, 'Courier New', Courier, monospace;
   white-space: pre-wrap;
+  z-index: 100;
+  background-color: hsla(0, 0%, 0%, 0.5);
 }
 
 .positionable {
