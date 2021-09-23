@@ -1,7 +1,7 @@
-import { Player } from "../Player.js";
-import { Positionable } from "../Positionable.js";
-import { Equipable } from "../Equipable.js";
-import { Updateable } from "../Updateable.js";
+import { Player } from "../Player";
+import { Equipable } from "../Equipable";
+import { Icon } from "../Icon";
+import { Displaceable } from "../Displaceable";
 
 export class WaterGun extends Equipable {
 
@@ -9,26 +9,14 @@ export class WaterGun extends Equipable {
     super(repeatRate)
   }
 
-  use(player: Player, currentTime: number): Updateable {
+  use(player: Player, currentTime: number): Displaceable {
     this.setLastUsed(currentTime)
     const pv = player.getInputDevice().getAimVector()
     const wv = pv.multiply(2.5)
-    return new Water(player.getPosition(), wv.getComponents())
+    return new Water(player.getP().toArray(), wv.toArray())
   }
 }
 
-export class Water extends Positionable implements Updateable {
-
-  private velocity: [number, number] = [0,0]
-
-  constructor(position: [number, number], velocity: [number, number]) {
-    super(position)
-    this.velocity = velocity
-    super.getDOMElement().textContent = '💦'
-  }
-
-  update() {
-    this.position[0] += this.velocity[0]
-    this.position[1] += this.velocity[1]
-  }
+export class Water extends Icon {
+  icon = '💦'
 }

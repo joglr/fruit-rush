@@ -1,9 +1,10 @@
-import { Positionable } from "./Positionable.js";
-import { pick } from "./util.js";
+import { Icon } from "./Icon";
+import { pick } from "./Math";
 
-export class Tree extends Positionable {
+export class Tree extends Icon {
+  icon
   constructor(position: [number, number]) {
     super(position);
-    super.getDOMElement().textContent = pick(["🌳", "🌲"]);
+    this.icon = pick(["🌳", "🌲"])
   }
 }

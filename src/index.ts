@@ -1,3 +1,4 @@
+import './style.css'
 // import State from './modules/State'
 // import Gamepad from './modules/Gamepad'
 // const state = State()
@@ -6,16 +7,15 @@ import init, {
   KeyboardInput,
   InputDevice,
   GamepadInput,
-} from "./modules/InputDevice.js";
-import { Player } from "./modules/Player.js";
-import { Positionable } from "./modules/Positionable.js";
-import { Updateable } from "./modules/Updateable.js";
-import { randBetween, Vector2 } from "./modules/util.js";
-import { Tree } from "./modules/Tree.js";
-import { Water } from "./modules/Equipables/WaterGun.js";
-import { Eucalyptus } from "./modules/Eucalyptus.js";
-import { POSITIONABLE_SIZE } from "./modules/settings.js";
-import { Fire } from "./modules/Equipables/NotAFlameThrower.js";
+} from "./modules/InputDevice";
+import { Player } from "./modules/Player";
+import { Displaceable } from "./modules/Displaceable";
+import { randBetween, Vector2 } from "./modules/Math";
+import { Tree } from "./modules/Tree";
+import { Water } from "./modules/Equipables/WaterGun";
+import { Eucalyptus } from "./modules/Eucalyptus";
+import { POSITIONABLE_SIZE } from "./modules/settings";
+import { Fire } from "./modules/Equipables/NotAFlameThrower";
 
 document.documentElement.style.setProperty('--positionableSize', `${POSITIONABLE_SIZE}px`)
 
@@ -25,8 +25,14 @@ const mapConfig = {
   imageSize: 12,
 };
 
-const gameContainer = document.querySelector("#game");
-const infoContainer = document.querySelector("#info");
+const gameContainer = document.querySelector("#game")!;
+const infoContainer = document.querySelector("#info")!;
+const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement;
+const ctx = canvas.getContext("2d")!;
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
 let lastAnimationFrameID: number;
 // let inputDevice: InputDevice
 
@@ -62,19 +68,17 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
   for (const p of players) {
     const gp = p.getInputDevice() as GamepadInput;
     if (gp.getGamepadIndex() === e.gamepad.index) {
-      p.getDOMElement().remove();
       players.delete(p);
     }
   }
 });
 
-window.addEventListener("click", (e) => {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  const fire = new Fire([e.pageX - W / 2, e.pageY - H / 2]);
-  gameContainer?.appendChild(fire.getDOMElement());
-  positionables.add(fire);
-});
+// window.addEventListener("click", (e) => {
+//   const W = window.innerWidth;
+//   const H = window.innerHeight;
+//   const fire = new Fire([e.pageX - W / 2, e.pageY - H / 2]);
+//   positionables.add(fire);
+// });
 
 const pausedText = " (Paused)";
 
@@ -91,7 +95,6 @@ document.addEventListener("visibilitychange", () => {
 let lastFrameTime: number;
 
 function gameLoop(timeStamp: number) {
-  // @ts-ignore
   infoContainer.textContent = `fps ${calcFPS(
     lastFrameTime,
     timeStamp
@@ -99,52 +102,60 @@ function gameLoop(timeStamp: number) {
 
   const flooredTimeStamp = Math.round(timeStamp);
 
+
+
   // Interval events
-  if (flooredTimeStamp % 100 === 0 && positionables.size < 400) {
-    const [W, H] = getWH();
+  // if (flooredTimeStamp % 100 === 0 && positionables.size < 400) {
+  //   const [W, H] = getWH();
 
-    let [x, y] = generateRandomPos(W, H).getComponents();
-    const fire = new Fire([x, y]);
-    positionables.add(fire);
-    gameContainer?.appendChild(fire.getDOMElement());
+  //   let [x, y] = generateRandomPos(W, H).getComponents();
+  //   const fire = new Fire([x, y]);
+  //   positionables.add(fire);
+  //   gameContainer?.appendChild(fire.getDOMElement());
 
-    [x, y] = generateRandomPos(W, H).getComponents();
-    const water = new Water([x, y], [0,0]);
-    positionables.add(water);
-    gameContainer?.appendChild(water.getDOMElement());
+  //   [x, y] = generateRandomPos(W, H).getComponents();
+  //   const water = new Water([x, y], [0,0]);
+  //   positionables.add(water);
+  //   gameContainer?.appendChild(water.getDOMElement());
 
-    [x, y] = generateRandomPos(W, H).getComponents();
-    const eucalyptus = new Eucalyptus([x, y]);
-    positionables.add(eucalyptus);
-    gameContainer?.appendChild(eucalyptus.getDOMElement());
+  //   [x, y] = generateRandomPos(W, H).getComponents();
+  //   const eucalyptus = new Eucalyptus([x, y]);
+  //   positionables.add(eucalyptus);
+  //   gameContainer?.appendChild(eucalyptus.getDOMElement());
 
 
-  }
+  // }
 
   for (const p of players) {
+    // p.icon = "😀"
     const mv = p
       .getInputDevice()
       .getMovementVector()
-      .getComponents()
+
+    const mvs = mv
+      .toArray()
       .toString();
-    const av = p.getInputDevice().getAimVector().getComponents().toString();
-    const pp = p.getPosition().toString();
+
+    const threeDecimals = (x : number) => x.toFixed(3)
+    const av = p.getInputDevice().getAimVector().toArray().toString();
+    const pp = p.getP().toArray().map(threeDecimals).toString();
+    const pv = p.getV().toArray().map(threeDecimals).toString();
+    const pa = p.getA().toArray().map(threeDecimals).toString();
     //@ts-ignore
     infoContainer.innerHTML +=
       "\n" +
       `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${
-        Player.playerIcon
+        p.icon
       }
-  ${mv}
-  ${av}
-  ${pp}
+  ${mvs} l: ${mv.getMagnitude()}
+  aim: ${av}
+  p: ${pp}
+  v: ${pv}
+  a: ${pa}
   isOnFire: ${p.getIsOnFire()}
   health: ${p.getHealth()}
   </div>`;
   }
-  //@ts-ignore
-  infoContainer.innerHTML += `
-Updateables: ${updateables.size}`;
   //@ts-ignore
   infoContainer.innerHTML += `
 Positionables: ${positionables.size}`;
@@ -163,14 +174,16 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 function render() {
   const [W, H] = getWH();
 
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0,0, ...getWH())
+
   for (const p of positionables) {
-    const pos = p.getPosition();
-    const x = W / 2 + pos[0];
-    const y = H / 2 + pos[1];
-    p.getDOMElement().style.transform = `translate(${x}px,${y}px)`;
-    if (p instanceof Player) {
-      p.getDOMElement().style.opacity = `${(p.getHealth() / 100)**2}`
-    }
+    // const pos = p.getPosition();
+    // const x = W / 2 + pos[0];
+    // const y = H / 2 + pos[1];
+
+    // p.draw(ctx)
+    p.drawWithHitbox(ctx)
   }
 }
 
@@ -193,7 +206,7 @@ function updateGameState(timeStamp: number) {
     const v: [
       number,
       number
-    ] = player.getInputDevice().getMovementVector().getComponents();
+    ] = player.getInputDevice().getMovementVector().toArray();
     const positiveAimVector: [
       number,
       number
@@ -201,8 +214,7 @@ function updateGameState(timeStamp: number) {
       .getInputDevice()
       .getAimVector()
       .toPositiveVector()
-      .getComponents();
-    player.setPosition([pos[0] + v[0], pos[1] + v[1]]);
+      .toArray();
 
     // Events that occur every second:
 
@@ -213,16 +225,27 @@ function updateGameState(timeStamp: number) {
     }
 
     if (
-      player.getInputDevice().getPrimaryActionButtonIsDown() &&
-      (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+      player.getInputDevice().getPrimaryActionButtonIsDown()
+      //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
     ) {
-      if (player.getPrimaryActionEquipable().canUse(timeStamp)) {
-        player.getInputDevice().hapticFeedback();
-        const thing = player.getPrimaryActionEquipable().use(player, timeStamp);
-        positionables.add(thing);
-        updateables.add(thing);
-        gameContainer?.appendChild(thing.getDOMElement());
+
+      const [,H] = getWH()
+      const [,h] = player.getDimensions()
+      const distFromBottom = H - (h / 2) - player.getP()[1]
+      console.log({distFromBottom})
+      const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0
+      console.log(H - h / 2)
+      console.log(player.getP()[1])
+      console.log(canJump)
+      if (canJump)  {
+        player.setVelocity(player.getV().add(new Vector2(0,-5)))
       }
+
+      // if (player.getPrimaryActionEquipable().canUse(timeStamp)) {
+      //   player.getInputDevice().hapticFeedback();
+      //   const thing = player.getPrimaryActionEquipable().use(player, timeStamp);
+      //   positionables.add(thing);
+      // }
     }
 
     if (
@@ -233,8 +256,6 @@ function updateGameState(timeStamp: number) {
         player.getInputDevice().hapticFeedback();
         const thing = player.getSecondaryActionEquipable().use(player, timeStamp);
         positionables.add(thing);
-        updateables.add(thing);
-        gameContainer?.appendChild(thing.getDOMElement());
       }
     }
 
@@ -243,18 +264,30 @@ function updateGameState(timeStamp: number) {
   const W = window.innerWidth;
   const H = window.innerHeight;
 
-  for (const updateable of updateables) {
-    updateable.update();
-    const [x, y] = updateable.getPosition();
-    if (x < -W / 2 || x > W / 2 || y < -H / 2 || y > H / 2) {
-      const delFromPos = positionables.delete(updateable);
-      const delFromUpds = updateables.delete(updateable);
-      updateable.getDOMElement().remove();
-      if (!delFromPos || !delFromUpds)
-        console.log("Unable to remove unreachable updateable");
-    }
-  }
   for (const p of positionables) {
+    p.update();
+    const [x, y] = p.getPosition();
+    const [w, h] = p.getDimensions();
+
+    let xCollision = x < w / 2 || x > W - w / 2
+    let yCollision = y < h / 2 || y > H - h / 2
+    if (xCollision || yCollision) {
+      if (p instanceof Player) {
+        let [vx, vy] = p.getV()
+        if (xCollision) {
+          vx *= -1
+        }
+        if (yCollision) {
+          vy = 0;
+          // if ()
+        }
+        const v = Vector2.fromArray([vx, vy])
+          // .multiply(0.9);
+        if (!v.is(p.getV())) p.setVelocity(v)
+      }
+      // const delFromPos = positionables.delete(p);
+      // if (!delFromPos) console.log("Unable to remove unreachable updateable");
+    }
     for (const op of positionables) {
       // 💦 -> 🔥
       if (p instanceof Water && op instanceof Fire) {
@@ -262,9 +295,6 @@ function updateGameState(timeStamp: number) {
         if (p.intersectsWith(op)) {
           positionables.delete(p);
           positionables.delete(op);
-          p.getDOMElement().remove();
-          op.getDOMElement().remove();
-          updateables.delete(p);
           break;
         }
       }
@@ -273,36 +303,32 @@ function updateGameState(timeStamp: number) {
       if (p instanceof Fire && op instanceof Player) {
         // Set player on fire if they intersect fire
 
-        if (p.intersectsWith(op)) {
-          op.damage(Fire.impactDamage);
-          if (!op.getIsOnFire()) {
-            op.setOnFire();
-            op.getDOMElement().textContent += Fire.fireIcon;
-            break;
-          }
-        }
+        // if (p.intersectsWith(op)) {
+        //   op.damage(Fire.impactDamage);
+        //   if (!op.getIsOnFire()) {
+        //     op.setOnFire();
+        //     break;
+        //   }
+        // }
       }
 
       // 💦 -> 🐨
       if (p instanceof Water && op instanceof Player) {
         // Extinguish player if they intersect with water
-        if (p.intersectsWith(op) && op.getIsOnFire()) {
-          op.extinguish();
-          op.getDOMElement().textContent = Player.playerIcon;
-          positionables.delete(p);
-          p.getDOMElement().remove();
+        // if (p.intersectsWith(op) && op.getIsOnFire()) {
+        //   op.extinguish();
+        //   positionables.delete(p);
 
-          break;
-        }
+        //   break;
+        // }
       }
 
       // 🌿 -> 🐨
       if (p instanceof Eucalyptus && op instanceof Player) {
-        // Extinguish player if they intersect with water
+        // Heal player if they intersect with Eucalyptus
         if (p.intersectsWith(op) && op.getHealth() < Player.initialHealth) {
           op.heal(Eucalyptus.healAmount);
           positionables.delete(p);
-          p.getDOMElement().remove();
 
           break;
         }
@@ -312,16 +338,15 @@ function updateGameState(timeStamp: number) {
 }
 
 const players: Set<Player> = new Set();
-const positionables: Set<Positionable> = new Set();
-const updateables: Set<Updateable> = new Set();
+const positionables: Set<Displaceable> = new Set();
 
 init();
-generateMap();
+// generateMap();
 lastAnimationFrameID = requestAnimationFrame(gameLoop);
 
 function createPlayer(inputDevice: InputDevice) {
   const player = new Player(inputDevice);
-  gameContainer?.appendChild(player.getDOMElement());
+  player.setPosition(Vector2.fromArray(getWH().map(x => x / 2)))
   players.add(player);
   positionables.add(player);
 }
@@ -335,31 +360,27 @@ function generateMap() {
   const [W, H] = getWH();
 
   for (let i = 0; i < fireCount; i++) {
-    const [x, y] = generateRandomPos(W, H).getComponents();
+    const [x, y] = generateRandomPos(W, H).toArray();
     const fire = new Fire([x, y]);
     positionables.add(fire);
-    gameContainer?.appendChild(fire.getDOMElement());
   }
 
   for (let i = 0; i < waterCount; i++) {
-    const [x, y] = generateRandomPos(W, H).getComponents();
+    const [x, y] = generateRandomPos(W, H).toArray();
     const water = new Water([x, y], [0, 0]);
     positionables.add(water);
-    gameContainer?.appendChild(water.getDOMElement());
   }
 
   for (let i = 0; i < treeCount; i++) {
-    const [x, y] = generateRandomPos(W, H).getComponents();
+    const [x, y] = generateRandomPos(W, H).toArray();
     const tree = new Tree([x, y]);
     positionables.add(tree);
-    gameContainer?.appendChild(tree.getDOMElement());
   }
 
   for (let i = 0; i < eucalyptusCount; i++) {
-    const [x, y] = generateRandomPos(W, H).getComponents();
+    const [x, y] = generateRandomPos(W, H).toArray();
     const eucalyptus = new Eucalyptus([x, y]);
     positionables.add(eucalyptus);
-    gameContainer?.appendChild(eucalyptus.getDOMElement());
   }
 }
 
@@ -369,6 +390,6 @@ function generateRandomPos(maxX: number, maxY: number) {
   return new Vector2(x, y);
 }
 
-function getWH() {
+function getWH() : [number, number] {
   return [window.innerWidth, window.innerHeight];
 }

@@ -1,5 +1,5 @@
-import { Positionable } from './Positionable.js'
+import { Displaceable } from './Displaceable'
 
-export interface Danger extends Positionable {
+export interface Danger extends Displaceable {
   // 🤔 what should a danger have??
 }

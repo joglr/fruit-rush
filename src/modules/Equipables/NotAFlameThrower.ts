@@ -1,37 +1,25 @@
-import { Player } from '../Player.js'
-import { Positionable } from '../Positionable.js'
-import { Equipable } from '../Equipable.js'
-import { Updateable } from '../Updateable.js'
+import { Player } from '../Player'
+import { Displaceable } from '../Displaceable'
+import { Equipable } from '../Equipable'
+import { Vector2 } from '../Math'
+import { Icon } from '../Icon'
 
 export class NotAFlameThrower extends Equipable {
   constructor(repeatRate: number) {
     super(repeatRate)
   }
 
-  use(player: Player, currentTime: number): Updateable {
+  use(player: Player, currentTime: number) {
     this.setLastUsed(currentTime)
     const pv = player.getInputDevice().getAimVector()
     const wv = pv.multiply(2.5)
-    return new Fire(player.getPosition(), wv.getComponents())
+    return new Fire(player.getP().toArray(), wv.toArray())
   }
 }
 
-export class Fire extends Positionable implements Updateable {
-  static fireIcon = '🔥'
+export class Fire extends Icon   {
+  icon = '🔥'
   // Fire damage inflicted on the player pr. second
   static fireDamage = 1
   static impactDamage = 0.05
-
-  private velocity: [number, number] = [0, 0]
-
-  constructor(position: [number, number], velocity: [number, number] = [0, 0]) {
-    super(position)
-    this.velocity = velocity
-    super.getDOMElement().textContent = Fire.fireIcon
-  }
-
-  update() {
-    this.position[0] += this.velocity[0]
-    this.position[1] += this.velocity[1]
-  }
 }

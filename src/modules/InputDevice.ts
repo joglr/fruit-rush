@@ -3,11 +3,11 @@
 //   KEYBOARD
 // }
 
-import { Vector2 } from "./util.js"
+import { UnitVector2, Vector2 } from "./Math"
 
 export interface InputDevice {
-  getMovementVector(): Vector2
-  getAimVector(): Vector2
+  getMovementVector(): UnitVector2
+  getAimVector(): UnitVector2
   hapticFeedback(): void
   getPrimaryActionButtonIsDown(): boolean
   getSecondaryActionButtonIsDown(): boolean
@@ -17,13 +17,13 @@ let initialized = false
 
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
-  getMovementVector(): Vector2 {
+  getMovementVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
     // @ts-ignore
     const x = gp.axes[0]
     // @ts-ignore
     const y = gp.axes[1]
-    return new Vector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
+    return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
 
   getGamepadIndex() {
@@ -35,7 +35,6 @@ export class GamepadInput implements InputDevice {
   }
   hapticFeedback(): void {
     const gamepads = navigator?.getGamepads()
-    debugger
     // @ts-ignore
     gamepads[this.gamepadIndex]?.vibrationActuator.playEffect("dual-rumble", {
       startDelay: 0,
@@ -45,13 +44,13 @@ export class GamepadInput implements InputDevice {
     })
 
   }
-  getAimVector(): Vector2 {
+  getAimVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
     // @ts-ignore
     const x = gp.axes[2]
     // @ts-ignore
     const y = gp.axes[3]
-    return new Vector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
+    return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
   getPrimaryActionButtonIsDown(): boolean {
     return navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true

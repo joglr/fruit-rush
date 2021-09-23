@@ -1,14 +1,9 @@
-import { Positionable } from './Positionable.js'
-import { Player } from './Player.js'
+import { Icon } from './Icon'
+import { Player } from './Player'
 
-export class Eucalyptus extends Positionable {
+export class Eucalyptus extends Icon {
+  icon = '🌿'
 
   static healAmount = Player.initialHealth
 //   static healAmount = 5
-
-  constructor(position: [number, number]) {
-    super(position)
-    super.getDOMElement().textContent = '🌿'
-  }
-
 }

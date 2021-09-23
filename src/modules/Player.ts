@@ -1,26 +1,30 @@
-import { InputDevice } from './InputDevice.js'
-import { Positionable } from './Positionable.js'
-import { WaterGun } from './Equipables/WaterGun.js'
-import { NotAFlameThrower } from './Equipables/NotAFlameThrower.js'
+import { InputDevice } from "./InputDevice"
+import { Displaceable } from "./Displaceable"
+import { WaterGun } from "./Equipables/WaterGun"
+import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
+import { Icon } from "./Icon"
+import { Axis, pick } from "./Math"
 
-export class Player extends Positionable {
+let currentHue = 0
 
-  private static currentHue = 0
-  private static genHue(): number {
-    const hue = this.currentHue
-    Player.currentHue += 45
-    return hue
-  }
+function genHue(): number {
+  const hue = currentHue
+  currentHue += 45
+  return hue
+}
+
+const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵"])
+export class Player extends Icon {
+  icon = getMonkey()
 
   static initialHealth = 100
-  static playerIcon = '🐨'
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
   }
 
   private inputDevice: InputDevice
-  private hue = Player.genHue()
+  private hue = genHue()
 
   private health: number = Player.initialHealth
   private isOnFire: boolean = false
@@ -28,12 +32,17 @@ export class Player extends Positionable {
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
   constructor(inputDevice: InputDevice) {
-    super([0,0])
+    super([0, 0.05])
+    setInterval(() => {
+      this.icon = getMonkey()
+    }, 1000)
     this.inputDevice = inputDevice
-    this.DOMElement.textContent = Player.playerIcon
-    this.DOMElement.classList.add('positionable')
-    this.DOMElement.style.filter = Player.createFilter(this.hue)
   }
+
+  getColor() {
+    return `hsl(${this.hue} 50% 50%)`
+  }
+
   getInputDevice() {
     return this.inputDevice
   }
@@ -46,7 +55,6 @@ export class Player extends Positionable {
   getHue(): number {
     return this.hue
   }
-
 
   setOnFire() {
     this.isOnFire = true
@@ -73,5 +81,14 @@ export class Player extends Positionable {
     // TODO: Handle player ded
   }
 
-
+  update() {
+    const velocityChange =
+      this
+        .getInputDevice()
+        .getMovementVector()
+        .divide(10)
+        .constrainToAxis(Axis.X)
+    this.v = this.v.add(velocityChange)
+    super.update()
+  }
 }
