@@ -26,6 +26,31 @@ import {
 //   imageSize: 12,
 // };
 
+const getSoundPath = (x: string) => `./sounds/${x}.wav`
+
+const sounds = {
+  "jump": 0,
+  "hit": 1,
+  "shoot": 2,
+  "eat": 3,
+}
+
+
+const audios = Object.keys(sounds).map(s => {
+  const a = document.createElement("audio")
+  a.src = getSoundPath(s);
+
+  a.volume = 0.5
+
+  return () => {
+    a.pause()
+    a.currentTime = 0;
+    a.play()
+  }
+})
+
+export const playSFX = (key: keyof typeof sounds) => audios[sounds[key]]()
+
 // const gameContainer = document.querySelector("#game")!;
 const debugContainer = document.querySelector("#debug")!
 const scoreboardContainer = document.querySelector("#scoreboard")!
@@ -227,6 +252,7 @@ function updateGameState(timeStamp: number) {
       const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0
 
       if (canJump) {
+        playSFX("jump")
         const jumpVector = new Vector2(0, playerJumpAmount)
         player.setVelocity(player.getV().add(jumpVector))
       }

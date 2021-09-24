@@ -10,6 +10,7 @@ import {
   playerMinHorizontalVelocity,
   playerTurnStrength,
 } from "./config"
+import { playSFX } from ".."
 
 let currentHue = 0
 
@@ -60,13 +61,11 @@ export class Player extends Icon {
   constructor(playerNumber: number, inputDevice: InputDevice) {
     super([0, gravityAmount])
     this.playerNumber = playerNumber
-    // this.monkeyInterval = setInterval(() => {
-    //   this.icon = getMonkey()
-    // }, 1000)
     this.inputDevice = inputDevice
   }
 
   eat(value: number) {
+    playSFX("eat")
     this.icon = states.EAT
     this.resetIconTimeout = setTimeout(() => {
       this.icon = states.DEFAULT
@@ -107,6 +106,8 @@ export class Player extends Icon {
   }
 
   stun() {
+    playSFX("hit");
+    this.damage(1)
     this.isStunned = true
     clearTimeout(this.resetIconTimeout)
     this.icon = states.STUNNED

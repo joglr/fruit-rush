@@ -3,6 +3,7 @@ import { Equipable } from "../Equipable";
 import { Icon } from "../Icon";
 import { Displaceable } from "../Displaceable";
 import { gravityAmount, poopRecoilMultiplier, poopVelocity } from "../config";
+import { playSFX } from "../..";
 
 export class PoopGun extends Equipable {
 
@@ -14,6 +15,7 @@ export class PoopGun extends Equipable {
     if (p.isStunned || !this.canUse(currentTime) || p.getScore() == 0) return;
     p.addToScore(-1);
     this.setLastUsed(currentTime)
+    playSFX("shoot")
     p.getInputDevice().hapticFeedback();
     const pv = p.getInputDevice().getAimVector()
     const wv = pv.setMagnitude(poopVelocity + p.getV().getMagnitude())
