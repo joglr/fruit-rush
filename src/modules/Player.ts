@@ -2,7 +2,7 @@ import { InputDevice } from "./InputDevice"
 import { PoopGun } from "./Equipables/PoopGun"
 import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
 import { Icon } from "./Icon"
-import { Axis, pick } from "./Math"
+import { Axis } from "./Math"
 import {
   gravityAmount,
   playerIndicatorOffset,
@@ -26,7 +26,7 @@ const states = {
   EAT: '🙊'
 }
 
-const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
+// const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
 export class Player extends Icon {
   private score = 0
   icon = states.DEFAULT
@@ -37,7 +37,7 @@ export class Player extends Icon {
   hasDiarrhea = false
   stunTimeout = -1
   resetIconTimeout = -1
-  dead: boolean
+  dead = false
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`

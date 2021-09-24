@@ -11,7 +11,6 @@ import init, {
 import { Player } from "./modules/Player"
 import { Displaceable } from "./modules/Displaceable"
 import { randBetween, Vector2 } from "./modules/Math"
-import { Tree } from "./modules/Tree"
 import { Poop } from "./modules/Equipables/PoopGun"
 import { Food } from "./modules/Food"
 import { Fire } from "./modules/Equipables/NotAFlameThrower"
@@ -202,8 +201,6 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 // Render
 
 function render(timeStamp: number) {
-  const [W, H] = getWH()
-
   ctx.fillStyle = "#000"
   ctx.fillRect(0, 0, ...getWH())
 
@@ -228,11 +225,6 @@ function updateGameState(timeStamp: number) {
   }
 
   for (const player of players) {
-    const pos = player.getPosition()
-    const v: [number, number] = player
-      .getInputDevice()
-      .getMovementVector()
-      .toArray()
     const positiveAimVector: [number, number] = player
       .getInputDevice()
       .getAimVector()
@@ -390,44 +382,44 @@ function createPlayer(inputDevice: InputDevice) {
   displaceables.add(player)
 }
 
-function generateMap() {
-  let fireCount = 50
-  let waterCount = 10
-  let treeCount = 200
-  let eucalyptusCount = 10
+// function generateMap() {
+//   let fireCount = 50
+//   let waterCount = 10
+//   let treeCount = 200
+//   let eucalyptusCount = 10
 
-  const [W, H] = getWH()
+//   const [W, H] = getWH()
 
-  for (let i = 0; i < fireCount; i++) {
-    const [x, y] = generateRandomPos(W, H).toArray()
-    const fire = new Fire([x, y])
-    displaceables.add(fire)
-  }
+//   for (let i = 0; i < fireCount; i++) {
+//     const [x, y] = generateRandomPos(W, H).toArray()
+//     const fire = new Fire([x, y])
+//     displaceables.add(fire)
+//   }
 
-  for (let i = 0; i < waterCount; i++) {
-    const [x, y] = generateRandomPos(W, H).toArray()
-    const water = new Poop([x, y], [0, 0])
-    displaceables.add(water)
-  }
+//   for (let i = 0; i < waterCount; i++) {
+//     const [x, y] = generateRandomPos(W, H).toArray()
+//     const water = new Poop([x, y], [0, 0])
+//     displaceables.add(water)
+//   }
 
-  for (let i = 0; i < treeCount; i++) {
-    const [x, y] = generateRandomPos(W, H).toArray()
-    const tree = new Tree([x, y])
-    displaceables.add(tree)
-  }
+//   for (let i = 0; i < treeCount; i++) {
+//     const [x, y] = generateRandomPos(W, H).toArray()
+//     const tree = new Tree([x, y])
+//     displaceables.add(tree)
+//   }
 
-  for (let i = 0; i < eucalyptusCount; i++) {
-    const [x, y] = generateRandomPos(W, H).toArray()
-    const food = new Food([x, y])
-    displaceables.add(food)
-  }
-}
+//   for (let i = 0; i < eucalyptusCount; i++) {
+//     const [x, y] = generateRandomPos(W, H).toArray()
+//     const food = new Food([x, y])
+//     displaceables.add(food)
+//   }
+// }
 
-function generateRandomPos(maxX: number, maxY: number) {
-  const x = randBetween(-maxX, maxX)
-  const y = randBetween(-maxY, maxY)
-  return new Vector2(x, y)
-}
+// function generateRandomPos(maxX: number, maxY: number) {
+//   const x = randBetween(-maxX, maxX)
+//   const y = randBetween(-maxY, maxY)
+//   return new Vector2(x, y)
+// }
 
 function getWH(): [number, number] {
   return [window.innerWidth, window.innerHeight]

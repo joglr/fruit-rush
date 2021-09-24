@@ -1,7 +1,5 @@
 import { Player } from '../Player'
-import { Displaceable } from '../Displaceable'
 import { Equipable } from '../Equipable'
-import { Vector2 } from '../Math'
 import { Icon } from '../Icon'
 
 export class NotAFlameThrower extends Equipable {
