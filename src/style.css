@@ -25,18 +25,28 @@ body {
   overflow: hidden;
 }
 
-#info {
+#debug {
   position: absolute;
   top: 0;
   font-family: Consolas, 'Courier New', Courier, monospace;
   white-space: pre-wrap;
   z-index: 100;
   background-color: hsla(0, 0%, 0%, 0.5);
+  display: none;
 }
 
-.positionable {
+#scoreboard {
   position: absolute;
   top: 0;
-  display: inline-block;
-  font-size: var(--positionableSize)
+  left: 0;
+  right: 0;
+  color: #fff;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 30px;
+  /* grid-template-columns: min-content; */
+  font-weight: bold;
+  font-size: 40px;
 }

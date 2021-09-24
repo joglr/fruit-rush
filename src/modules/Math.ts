@@ -2,15 +2,20 @@ export function randBetween(from: number, to: number) {
   return from + Math.floor(Math.random() * (to - from))
 }
 
+type AxisIndex = 0 | 1
+
 export enum Axis {
-  X,Y
+  X,
+  Y,
 }
 
-export class Vector2  {
+const axisToIndex = (a: Axis): AxisIndex => Number(a) as AxisIndex
+
+export class Vector2 {
   static NullVector = new Vector2(0, 0)
 
-  0: number;
-  1: number;
+  0: number
+  1: number
 
   constructor(x: number, y: number) {
     this[0] = x
@@ -29,7 +34,7 @@ export class Vector2  {
   constrainToAxis(a: Axis): Vector2 {
     if (a === Axis.X) return new Vector2(this[0], 0)
     if (a === Axis.Y) return new Vector2(0, this[1])
-    throw new Error
+    throw new Error()
   }
 
   toArray(): [number, number] {
@@ -53,21 +58,15 @@ export class Vector2  {
   }
 
   add(v: Vector2) {
-    const [x,y] = this
+    const [x, y] = this
     const [ox, oy] = v
-    return new Vector2(
-      x + ox,
-      y + oy
-    )
+    return new Vector2(x + ox, y + oy)
   }
 
   subtract(v: Vector2) {
-    const [x,y] = this
+    const [x, y] = this
     const [ox, oy] = v
-    return new Vector2(
-      x - ox,
-      y - oy
-    )
+    return new Vector2(x - ox, y - oy)
   }
 
   multiply(factor: number): Vector2 {
@@ -80,7 +79,7 @@ export class Vector2  {
     return this.multiply(1 / factor)
   }
 
-  setMagnitude(m : number) {
+  setMagnitude(m: number) {
     return this.toUnitVector().multiply(m)
   }
 
@@ -90,19 +89,45 @@ export class Vector2  {
 
   normalize = () => this.divide(this.getMagnitude())
 
+  limit(min: number, max: number) {
+    if (this.getMagnitude() > max) return this.setMagnitude(max)
+    if (this.getMagnitude() < min) return this.setMagnitude(min)
+    return this
+  }
+
+  copy() {
+    return Vector2.fromArray(this.toArray())
+  }
+
+  setAxis(value: number, axis: Axis) {
+    const tempVect = this.copy()
+    const axisIndex = axisToIndex(axis)
+    tempVect[axisIndex] = value
+    return tempVect
+  }
+
+  limitAxis(min: number, max: number, axis: Axis) {
+    const axisIndex = axisToIndex(axis)
+    return this.setAxis(limit(min, max, this[axisIndex]), axis)
+  }
+
   getMagnitudeSquared(): number {
     const [x, y] = this.toArray()
-    return x ** 2 + y ** 2;
+    return x ** 2 + y ** 2
   }
 
   static fromArray([x, y]: number[]) {
     return new Vector2(x, y)
   }
 
-
   *[Symbol.iterator]() {
     yield* [this[0], this[1]]
   }
+}
+
+export function limit(min: number, max: number, value: number) {
+  if (min > max) throw new Error("Min is larger than max")
+  return Math.min(Math.max(min, value), max)
 }
 
 export class UnitVector2 extends Vector2 {
@@ -111,6 +136,6 @@ export class UnitVector2 extends Vector2 {
   }
 }
 
-export function pick(items: any[]) {
+export function pick<T>(items: T[]) {
   return items[Math.floor(Math.random() * items.length)]
 }

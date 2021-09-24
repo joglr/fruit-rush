@@ -13,20 +13,19 @@ import { Displaceable } from "./modules/Displaceable";
 import { randBetween, Vector2 } from "./modules/Math";
 import { Tree } from "./modules/Tree";
 import { Water } from "./modules/Equipables/WaterGun";
-import { Eucalyptus } from "./modules/Eucalyptus";
-import { POSITIONABLE_SIZE } from "./modules/settings";
+import { Fruit } from "./modules/Banana";
 import { Fire } from "./modules/Equipables/NotAFlameThrower";
+import { gravityAmount, playerJumpAmount, playerTurnStrength } from './modules/config';
 
-document.documentElement.style.setProperty('--positionableSize', `${POSITIONABLE_SIZE}px`)
+// const mapConfig = {
+//   areaSize: 16,
+//   modelSize: 16,
+//   imageSize: 12,
+// };
 
-const mapConfig = {
-  areaSize: 16,
-  modelSize: 16,
-  imageSize: 12,
-};
-
-const gameContainer = document.querySelector("#game")!;
-const infoContainer = document.querySelector("#info")!;
+// const gameContainer = document.querySelector("#game")!;
+const debugContainer = document.querySelector("#debug")!;
+const scoreboardContainer = document.querySelector("#scoreboard")!;
 const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 
@@ -94,19 +93,19 @@ document.addEventListener("visibilitychange", () => {
 
 let lastFrameTime: number;
 
+
 function gameLoop(timeStamp: number) {
-  infoContainer.textContent = `fps ${calcFPS(
+
+  debugContainer.textContent = `fps ${calcFPS(
     lastFrameTime,
     timeStamp
   ).toFixed()} (${Math.round(timeStamp)})`;
 
-  const flooredTimeStamp = Math.round(timeStamp);
-
-
+  const flooredTimeStamp = Math.round(timeStamp / 15);
 
   // Interval events
-  // if (flooredTimeStamp % 100 === 0 && positionables.size < 400) {
-  //   const [W, H] = getWH();
+  if (flooredTimeStamp % 50 === 0 && displaceables.size < 400 && players.size > 0) {
+    const [W, H] = getWH();
 
   //   let [x, y] = generateRandomPos(W, H).getComponents();
   //   const fire = new Fire([x, y]);
@@ -117,16 +116,18 @@ function gameLoop(timeStamp: number) {
   //   const water = new Water([x, y], [0,0]);
   //   positionables.add(water);
   //   gameContainer?.appendChild(water.getDOMElement());
+  const margin = 50;
 
-  //   [x, y] = generateRandomPos(W, H).getComponents();
-  //   const eucalyptus = new Eucalyptus([x, y]);
-  //   positionables.add(eucalyptus);
-  //   gameContainer?.appendChild(eucalyptus.getDOMElement());
-
-
-  // }
+    const x = randBetween(margin, W - margin)
+    const banana = new Fruit([0,gravityAmount / 10], [0,0], [x, margin]);
+    displaceables.add(banana);
+  }
 
   for (const p of players) {
+    const scoreContainer = scoreboardContainer.children[Array.from(players).indexOf(p)]
+
+    scoreContainer.textContent = p.getScore().toString()
+
     // p.icon = "😀"
     const mv = p
       .getInputDevice()
@@ -142,7 +143,7 @@ function gameLoop(timeStamp: number) {
     const pv = p.getV().toArray().map(threeDecimals).toString();
     const pa = p.getA().toArray().map(threeDecimals).toString();
     //@ts-ignore
-    infoContainer.innerHTML +=
+    debugContainer.innerHTML +=
       "\n" +
       `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${
         p.icon
@@ -157,8 +158,8 @@ function gameLoop(timeStamp: number) {
   </div>`;
   }
   //@ts-ignore
-  infoContainer.innerHTML += `
-Positionables: ${positionables.size}`;
+  debugContainer.innerHTML += `
+Positionables: ${displaceables.size}`;
   updateGameState(timeStamp);
   render();
   lastAnimationFrameID = requestAnimationFrame(gameLoop);
@@ -177,7 +178,7 @@ function render() {
   ctx.fillStyle = "#000";
   ctx.fillRect(0,0, ...getWH())
 
-  for (const p of positionables) {
+  for (const p of displaceables) {
     // const pos = p.getPosition();
     // const x = W / 2 + pos[0];
     // const y = H / 2 + pos[1];
@@ -232,13 +233,11 @@ function updateGameState(timeStamp: number) {
       const [,H] = getWH()
       const [,h] = player.getDimensions()
       const distFromBottom = H - (h / 2) - player.getP()[1]
-      console.log({distFromBottom})
       const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0
-      console.log(H - h / 2)
-      console.log(player.getP()[1])
-      console.log(canJump)
+
       if (canJump)  {
-        player.setVelocity(player.getV().add(new Vector2(0,-5)))
+        const jumpVector = new Vector2(0,playerJumpAmount);
+        player.setVelocity(player.getV().add(jumpVector))
       }
 
       // if (player.getPrimaryActionEquipable().canUse(timeStamp)) {
@@ -255,7 +254,7 @@ function updateGameState(timeStamp: number) {
       if (player.getSecondaryActionEquipable().canUse(timeStamp)) {
         player.getInputDevice().hapticFeedback();
         const thing = player.getSecondaryActionEquipable().use(player, timeStamp);
-        positionables.add(thing);
+        displaceables.add(thing);
       }
     }
 
@@ -264,43 +263,47 @@ function updateGameState(timeStamp: number) {
   const W = window.innerWidth;
   const H = window.innerHeight;
 
-  for (const p of positionables) {
-    p.update();
-    const [x, y] = p.getPosition();
-    const [w, h] = p.getDimensions();
+  for (const d of displaceables) {
+    d.update();
+    const [x, y] = d.getPosition();
+    const [w, h] = d.getDimensions();
 
     let xCollision = x < w / 2 || x > W - w / 2
     let yCollision = y < h / 2 || y > H - h / 2
+
     if (xCollision || yCollision) {
-      if (p instanceof Player) {
-        let [vx, vy] = p.getV()
+      if (d instanceof Player) {
+        let [vx, vy] = d.getV()
         if (xCollision) {
           vx *= -1
+
         }
         if (yCollision) {
           vy = 0;
-          // if ()
+          vx *= 0.7
         }
         const v = Vector2.fromArray([vx, vy])
           // .multiply(0.9);
-        if (!v.is(p.getV())) p.setVelocity(v)
+        if (!v.is(d.getV())) d.setVelocity(v)
+      } else {
+        // Delete non-players when colliding with the ground
+        const delFromPos = displaceables.delete(d);
+        if (!delFromPos) console.log("Unable to remove unreachable updateable");
       }
-      // const delFromPos = positionables.delete(p);
-      // if (!delFromPos) console.log("Unable to remove unreachable updateable");
     }
-    for (const op of positionables) {
+    for (const op of displaceables) {
       // 💦 -> 🔥
-      if (p instanceof Water && op instanceof Fire) {
+      if (d instanceof Water && op instanceof Fire) {
         // Extinguish fire with water if they intersect
-        if (p.intersectsWith(op)) {
-          positionables.delete(p);
-          positionables.delete(op);
+        if (d.intersectsWith(op)) {
+          displaceables.delete(d);
+          displaceables.delete(op);
           break;
         }
       }
 
-      // 🔥 -> 🐨
-      if (p instanceof Fire && op instanceof Player) {
+      // 🔥 -> 🐵
+      if (d instanceof Fire && op instanceof Player) {
         // Set player on fire if they intersect fire
 
         // if (p.intersectsWith(op)) {
@@ -312,8 +315,8 @@ function updateGameState(timeStamp: number) {
         // }
       }
 
-      // 💦 -> 🐨
-      if (p instanceof Water && op instanceof Player) {
+      // 💦 -> 🐵
+      if (d instanceof Water && op instanceof Player) {
         // Extinguish player if they intersect with water
         // if (p.intersectsWith(op) && op.getIsOnFire()) {
         //   op.extinguish();
@@ -323,12 +326,15 @@ function updateGameState(timeStamp: number) {
         // }
       }
 
-      // 🌿 -> 🐨
-      if (p instanceof Eucalyptus && op instanceof Player) {
+      // 🍌 -> 🐵
+      if (d instanceof Fruit && op instanceof Player) {
         // Heal player if they intersect with Eucalyptus
-        if (p.intersectsWith(op) && op.getHealth() < Player.initialHealth) {
-          op.heal(Eucalyptus.healAmount);
-          positionables.delete(p);
+        if (d.intersectsWith(op)
+        //  && op.getHealth() < Player.initialHealth
+         ) {
+          op.heal(Fruit.healAmount);
+          op.increaseScore(1)
+          displaceables.delete(d);
 
           break;
         }
@@ -338,7 +344,7 @@ function updateGameState(timeStamp: number) {
 }
 
 const players: Set<Player> = new Set();
-const positionables: Set<Displaceable> = new Set();
+const displaceables: Set<Displaceable> = new Set();
 
 init();
 // generateMap();
@@ -348,7 +354,11 @@ function createPlayer(inputDevice: InputDevice) {
   const player = new Player(inputDevice);
   player.setPosition(Vector2.fromArray(getWH().map(x => x / 2)))
   players.add(player);
-  positionables.add(player);
+  const playerScore = document.createElement("div")
+  playerScore.style.color = player.getColor()
+  scoreboardContainer.appendChild(playerScore)
+
+  displaceables.add(player);
 }
 
 function generateMap() {
@@ -362,31 +372,31 @@ function generateMap() {
   for (let i = 0; i < fireCount; i++) {
     const [x, y] = generateRandomPos(W, H).toArray();
     const fire = new Fire([x, y]);
-    positionables.add(fire);
+    displaceables.add(fire);
   }
 
   for (let i = 0; i < waterCount; i++) {
     const [x, y] = generateRandomPos(W, H).toArray();
     const water = new Water([x, y], [0, 0]);
-    positionables.add(water);
+    displaceables.add(water);
   }
 
   for (let i = 0; i < treeCount; i++) {
     const [x, y] = generateRandomPos(W, H).toArray();
     const tree = new Tree([x, y]);
-    positionables.add(tree);
+    displaceables.add(tree);
   }
 
   for (let i = 0; i < eucalyptusCount; i++) {
     const [x, y] = generateRandomPos(W, H).toArray();
-    const eucalyptus = new Eucalyptus([x, y]);
-    positionables.add(eucalyptus);
+    const eucalyptus = new Fruit([x, y]);
+    displaceables.add(eucalyptus);
   }
 }
 
 function generateRandomPos(maxX: number, maxY: number) {
-  const x = randBetween(-maxX / 2, maxX / 2);
-  const y = randBetween(-maxY / 2, maxY / 2);
+  const x = randBetween(-maxX, maxX);
+  const y = randBetween(-maxY, maxY);
   return new Vector2(x, y);
 }
 

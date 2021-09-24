@@ -1,9 +1,14 @@
 import { InputDevice } from "./InputDevice"
-import { Displaceable } from "./Displaceable"
 import { WaterGun } from "./Equipables/WaterGun"
 import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
 import { Icon } from "./Icon"
 import { Axis, pick } from "./Math"
+import {
+  gravityAmount,
+  playerMaxHorizontalVelocity,
+  playerMinHorizontalVelocity,
+  playerTurnStrength,
+} from "./config"
 
 let currentHue = 0
 
@@ -15,6 +20,8 @@ function genHue(): number {
 
 const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵"])
 export class Player extends Icon {
+  private score = 0
+  private monkeyInterval
   icon = getMonkey()
 
   static initialHealth = 100
@@ -32,11 +39,21 @@ export class Player extends Icon {
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
   constructor(inputDevice: InputDevice) {
-    super([0, 0.05])
-    setInterval(() => {
+    super([0, gravityAmount])
+    this.monkeyInterval = setInterval(() => {
       this.icon = getMonkey()
     }, 1000)
     this.inputDevice = inputDevice
+  }
+
+  increaseScore(amount: number) {
+    this.score += amount;
+  }
+  resetScore() {
+    this.score = 0;
+  }
+  getScore() {
+    return this.score;
   }
 
   getColor() {
@@ -82,13 +99,16 @@ export class Player extends Icon {
   }
 
   update() {
-    const velocityChange =
-      this
-        .getInputDevice()
-        .getMovementVector()
-        .divide(10)
-        .constrainToAxis(Axis.X)
+    const velocityChange = this.getInputDevice()
+      .getMovementVector()
+      .multiply(playerTurnStrength)
+      .constrainToAxis(Axis.X)
     this.v = this.v.add(velocityChange)
     super.update()
+    this.v = this.v.limitAxis(playerMinHorizontalVelocity, playerMaxHorizontalVelocity, Axis.X)
+  }
+
+  dispose() {
+    window.clearInterval(this.monkeyInterval)
   }
 }
