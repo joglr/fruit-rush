@@ -13,7 +13,7 @@ import { Displaceable } from "./modules/Displaceable"
 import { randBetween, Vector2 } from "./modules/Math"
 import { Tree } from "./modules/Tree"
 import { Poop } from "./modules/Equipables/PoopGun"
-import { Fruit } from "./modules/Banana"
+import { Food } from "./modules/Food"
 import { Fire } from "./modules/Equipables/NotAFlameThrower"
 import {
   gravityAmount,
@@ -125,8 +125,8 @@ function gameLoop(timeStamp: number) {
     const margin = 50
 
     const x = randBetween(margin, W - margin)
-    const banana = new Fruit([0, gravityAmount / 10], [0, 0], [x, margin])
-    displaceables.add(banana)
+    const food = new Food([0, gravityAmount / 10], [0, 0], [x, margin])
+    displaceables.add(food)
   }
 
   for (const p of players) {
@@ -320,7 +320,7 @@ function updateGameState(timeStamp: number) {
       }
 
       // 🍌 -> 🐵
-      if (d instanceof Fruit && od instanceof Player) {
+      if (d instanceof Food && od instanceof Player) {
         // Heal player if they intersect with Eucalyptus
         if (
           d.intersectsWith(od)
@@ -383,8 +383,8 @@ function generateMap() {
 
   for (let i = 0; i < eucalyptusCount; i++) {
     const [x, y] = generateRandomPos(W, H).toArray()
-    const eucalyptus = new Fruit([x, y])
-    displaceables.add(eucalyptus)
+    const food = new Food([x, y])
+    displaceables.add(food)
   }
 }
 

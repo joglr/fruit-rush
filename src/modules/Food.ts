@@ -1,8 +1,7 @@
 import { Icon } from "./Icon"
 import { pick, Vector2 } from "./Math"
-import { Player } from "./Player"
 
-type FRUIT =
+type FOOD =
   | "🍌"
   | "🍎"
   | "🍏"
@@ -22,8 +21,7 @@ type FRUIT =
 
 const multiplier = 4
 
-const sizeMap : Map<FRUIT, [number, number]>  =
-new Map<FRUIT, [number, number]>([
+const sizeMap: Map<FOOD, [number, number]> = new Map<FOOD, [number, number]>([
   ["🍌", [13, 13]],
   ["🍎", [8, 8]],
   ["🍏", [8, 8]],
@@ -42,8 +40,8 @@ new Map<FRUIT, [number, number]>([
   ["🥭", [10, 10]],
 ])
 
-export class Fruit extends Icon {
-  icon = pick<FRUIT>([
+export class Food extends Icon {
+  icon = pick<FOOD>([
     "🍌",
     "🍎",
     "🍏",
@@ -62,7 +60,4 @@ export class Fruit extends Icon {
     "🥭",
   ])
   dimensions = Vector2.fromArray(sizeMap.get(this.icon)!.map(x => x * multiplier))
-
-  static healAmount = Player.initialHealth
-  //   static healAmount = 5
 }
