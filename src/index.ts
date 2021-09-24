@@ -155,10 +155,13 @@ function gameLoop(timeStamp: number) {
   }
 
   for (const p of players) {
+    if (p.dead) {
+      // TODO: Handle dead player
+    }
     const scoreContainer =
       scoreboardContainer.children[Array.from(players).indexOf(p)]
 
-    scoreContainer.textContent = p.getScore().toString()
+    scoreContainer.textContent = `${p.getScore().toString()}💩 ${p.getHealth()}❤`
 
     const mv = p.getInputDevice().getMovementVector()
 
@@ -352,7 +355,14 @@ function updateGameState(timeStamp: number) {
           d.intersectsWith(od)
           //  && op.getHealth() < Player.initialHealth
         ) {
-          od.heal(Fruit.healAmount)
+          // if (BAD.includes(d.icon)) {
+          //   od.hasDiarrhea = true
+          //   setTimeout(() => {
+          //     od.hasDiarrhea = false;
+          //   }, 2000)
+          //   // playSFX("kebab")
+          //   // TODO: Dihrearea
+          // }
           od.eat(1)
           displaceables.delete(d)
 

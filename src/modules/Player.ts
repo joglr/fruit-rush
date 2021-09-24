@@ -135,8 +135,13 @@ export class Player extends Icon {
   }
 
   damage(amount: number) {
-    this.health = Math.max(this.health - amount, 0)
-    // TODO: Handle player ded
+    const newHealth = Math.max(this.health - amount, 0)
+    if (newHealth <= 0) {
+      this.dead = true;
+      this.health = 0;
+    }
+    else this.health = newHealth
+    // TODO: Handle player death
   }
 
   update() {
