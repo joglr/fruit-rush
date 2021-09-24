@@ -191,7 +191,7 @@ function gameLoop(timeStamp: number) {
   debugContainer.innerHTML += `
 Positionables: ${displaceables.size}`
   updateGameState(timeStamp)
-  render()
+  render(timeStamp)
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
   lastFrameTime = timeStamp
 }
@@ -202,14 +202,14 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 
 // Render
 
-function render() {
+function render(timeStamp: number) {
   const [W, H] = getWH()
 
   ctx.fillStyle = "#000"
   ctx.fillRect(0, 0, ...getWH())
 
   for (const p of displaceables) {
-    p.draw(ctx)
+    p.draw(ctx, timeStamp)
     // p.drawWithHitbox(ctx)
   }
 }

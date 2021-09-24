@@ -31,23 +31,27 @@ export class Player extends Icon {
   private score = 0
   icon = states.DEFAULT
 
-  static initialHealth = 100
+  static initialHealth = 10
   playerNumber: number
   isStunned = false
+  hasDiarrhea = false
   stunTimeout = -1
   resetIconTimeout = -1
+  dead: boolean
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    super.draw(ctx)
+  draw(ctx: CanvasRenderingContext2D, timeStamp: number) {
+    super.draw(ctx, timeStamp)
     ctx.fillStyle = this.getColor()
     const [,h] = this.dimensions
+    const progress = this.getPrimaryActionEquipable().getProgress(timeStamp).toFixed(2)
     ctx.font = `bold ${h / 2}px sans-serif`
     const [x,y] = this.getPosition()
-    ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
+    ctx.fillText(progress, x, y - this.getDimensions()[1] - playerIndicatorOffset)
+    // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
   private inputDevice: InputDevice

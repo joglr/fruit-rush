@@ -1,3 +1,4 @@
+import { limit } from "./Math";
 import { Player } from "./Player";
 
 export abstract class Equipable {
@@ -10,6 +11,9 @@ export abstract class Equipable {
   }
   getRepeatRate() : number {
     return this.repeatRate
+  }
+  getProgress(currentTime: number) {
+    return limit(0, 1, (currentTime - this.lastUsed) /this.repeatRate)
   }
   setLastUsed(currentTime: number) {
     this.lastUsed = currentTime

@@ -6,9 +6,9 @@ export abstract class Displaceable {
   protected v: Vector2
   protected a: Vector2
 
-  abstract draw(ctx: CanvasRenderingContext2D): void
-  drawWithHitbox(ctx: CanvasRenderingContext2D) {
-    this.draw(ctx)
+  abstract draw(ctx: CanvasRenderingContext2D, timeStamp: number): void
+  drawWithHitbox(ctx: CanvasRenderingContext2D, timeStamp: number) {
+    this.draw(ctx, timeStamp)
     ctx.strokeStyle = this.getColor()
     const halfSize = this.getDimensions().multiply(0.5)
     const orig = this.p.subtract(halfSize)
