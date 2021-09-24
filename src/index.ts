@@ -61,7 +61,6 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
 let lastAnimationFrameID: number
-// let inputDevice: InputDevice
 
 // @ts-ignore
 window.addEventListener("gamepadconnected", (e: GamepadEvent) => {

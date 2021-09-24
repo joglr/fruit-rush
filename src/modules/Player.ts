@@ -115,7 +115,6 @@ export class Player extends Icon {
     this.isStunned = true
     clearTimeout(this.resetIconTimeout)
     this.icon = states.STUNNED
-    // if (this.stunTimeout >= 0) clearTimeout(this.stunTimeout)
     this.stunTimeout = setTimeout(() => {
       this.isStunned = false
       this.icon = states.DEFAULT
@@ -158,9 +157,5 @@ export class Player extends Icon {
     this.v = this.v.add(velocityChange)
     super.update()
     this.v = this.v.limitAxis(playerMinHorizontalVelocity, playerMaxHorizontalVelocity, Axis.X)
-  }
-
-  dispose() {
-    window.clearInterval(this.monkeyInterval)
   }
 }
