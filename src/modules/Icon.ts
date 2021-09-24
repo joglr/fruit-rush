@@ -6,9 +6,8 @@ export abstract class Icon extends Displaceable {
   draw(ctx: CanvasRenderingContext2D) {
     // TODO: Find a better way to specify type of Vector2 Generator, so this casting isn't necessary
     const coords = [...this.p] as unknown as [number, number]
-    const [w, h] = this.dimensions
+    const [,h] = this.dimensions
     ctx.font = `${h}px sans-serif`
-    let x = ctx.font
 
     ctx.fillStyle = "#fff"
     ctx.fillText(this.icon, ...coords)

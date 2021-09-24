@@ -106,6 +106,10 @@ export class Vector2 {
     return tempVect
   }
 
+  flip() {
+    return new Vector2(-this[0], -this[1])
+  }
+
   limitAxis(min: number, max: number, axis: Axis) {
     const axisIndex = axisToIndex(axis)
     return this.setAxis(limit(min, max, this[axisIndex]), axis)

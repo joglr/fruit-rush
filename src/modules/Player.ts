@@ -1,10 +1,11 @@
 import { InputDevice } from "./InputDevice"
-import { WaterGun } from "./Equipables/WaterGun"
+import { PoopGun } from "./Equipables/PoopGun"
 import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
 import { Icon } from "./Icon"
 import { Axis, pick } from "./Math"
 import {
   gravityAmount,
+  playerIndicatorOffset,
   playerMaxHorizontalVelocity,
   playerMinHorizontalVelocity,
   playerTurnStrength,
@@ -18,16 +19,34 @@ function genHue(): number {
   return hue
 }
 
-const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵"])
+const states = {
+  DEFAULT: '🐵',
+  STUNNED: '🙈',
+  EAT: '🙊'
+}
+
+const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
 export class Player extends Icon {
   private score = 0
-  private monkeyInterval
-  icon = getMonkey()
+  icon = states.DEFAULT
 
   static initialHealth = 100
+  playerNumber: number
+  isStunned = false
+  stunTimeout = -1
+  resetIconTimeout = -1
 
   static createFilter(hue: number, sepia: number = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    super.draw(ctx)
+    ctx.fillStyle = this.getColor()
+    const [,h] = this.dimensions
+    ctx.font = `bold ${h / 2}px sans-serif`
+    const [x,y] = this.getPosition()
+    ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
   private inputDevice: InputDevice
@@ -35,20 +54,30 @@ export class Player extends Icon {
 
   private health: number = Player.initialHealth
   private isOnFire: boolean = false
-  private primaryActionEquipable = new WaterGun(2000)
+  private primaryActionEquipable = new PoopGun(2000)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
-  constructor(inputDevice: InputDevice) {
+  constructor(playerNumber: number, inputDevice: InputDevice) {
     super([0, gravityAmount])
-    this.monkeyInterval = setInterval(() => {
-      this.icon = getMonkey()
-    }, 1000)
+    this.playerNumber = playerNumber
+    // this.monkeyInterval = setInterval(() => {
+    //   this.icon = getMonkey()
+    // }, 1000)
     this.inputDevice = inputDevice
   }
 
-  increaseScore(amount: number) {
+  eat(value: number) {
+    this.icon = states.EAT
+    this.resetIconTimeout = setTimeout(() => {
+      this.icon = states.DEFAULT
+    }, 500)
+    this.addToScore(value)
+  }
+
+  addToScore(amount: number) {
     this.score += amount;
   }
+
   resetScore() {
     this.score = 0;
   }
@@ -77,6 +106,17 @@ export class Player extends Icon {
     this.isOnFire = true
   }
 
+  stun() {
+    this.isStunned = true
+    clearTimeout(this.resetIconTimeout)
+    this.icon = states.STUNNED
+    // if (this.stunTimeout >= 0) clearTimeout(this.stunTimeout)
+    this.stunTimeout = setTimeout(() => {
+      this.isStunned = false
+      this.icon = states.DEFAULT
+    }, 2000)
+  }
+
   extinguish() {
     this.isOnFire = false
   }
@@ -99,10 +139,12 @@ export class Player extends Icon {
   }
 
   update() {
+    if (this.isStunned) return;
     const velocityChange = this.getInputDevice()
       .getMovementVector()
       .multiply(playerTurnStrength)
       .constrainToAxis(Axis.X)
+
     this.v = this.v.add(velocityChange)
     super.update()
     this.v = this.v.limitAxis(playerMinHorizontalVelocity, playerMaxHorizontalVelocity, Axis.X)

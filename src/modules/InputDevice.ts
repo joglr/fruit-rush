@@ -9,6 +9,7 @@ export interface InputDevice {
   getMovementVector(): UnitVector2
   getAimVector(): UnitVector2
   hapticFeedback(): void
+  getJumpButtonIsDown(): boolean
   getPrimaryActionButtonIsDown(): boolean
   getSecondaryActionButtonIsDown(): boolean
 }
@@ -55,8 +56,13 @@ export class GamepadInput implements InputDevice {
   getPrimaryActionButtonIsDown(): boolean {
     return navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true
   }
-  getSecondaryActionButtonIsDown(): boolean {
+
+  getJumpButtonIsDown(): boolean {
     return navigator.getGamepads()[this.gamepadIndex]?.buttons[6].pressed === true
+  }
+
+  getSecondaryActionButtonIsDown(): boolean {
+    return navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
   }
 }
 
@@ -74,12 +80,14 @@ export class KeyboardInput implements InputDevice {
   xNegAimKeys: string[]
   yPosAimKeys: string[]
   yNegAimKeys: string[]
+  jumpKey: string[]
   primaryActionKey: string[]
   secondaryActionKey: string[]
 
   constructor(
     xPos: string[], xNeg: string[], yPos: string[], yNeg: string[],
     xPosAim: string[], xNegAim: string[], yPosAim: string[], yNegAim: string[],
+    jumpKey: string[],
     primaryActionKey: string[],
     secondaryActionKey: string[],
     ) {
@@ -95,12 +103,18 @@ export class KeyboardInput implements InputDevice {
     this.xNegAimKeys = xNegAim
     this.yPosAimKeys = yPosAim
     this.yNegAimKeys = yNegAim
+    this.jumpKey = jumpKey
     this.primaryActionKey = primaryActionKey
     this.secondaryActionKey = secondaryActionKey
   }
+
   hapticFeedback(): void {
     // No haptic feedback for keyboard users...
   }
+  getJumpButtonIsDown(): boolean {
+    return KeyboardInput.keyIsDown(this.jumpKey)
+  }
+
   getPrimaryActionButtonIsDown(): boolean {
     return KeyboardInput.keyIsDown(this.primaryActionKey)
   }
