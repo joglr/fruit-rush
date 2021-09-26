@@ -19,10 +19,39 @@ const scoreboardContainer = document.querySelector("#scoreboard")!
 const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
 
-let lastAnimationFrameID: number
+function resizeHandler() {
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+}
+resizeHandler()
+window.addEventListener("resize", resizeHandler)
+
+let keyboardPlayerActive = false
+
+
+function keydownHandler(event: KeyboardEvent) {
+  if (!keyboardPlayerActive) {
+    keyboardPlayerActive = true
+    const inputDevice = new KeyboardInput({
+      xPos: ["d"],
+      xNeg: ["a"],
+      // yPos: ["s", ],
+      yNeg: [
+        /*"w"*/
+      ],
+      xPosAim: ["arrowright"],
+      xNegAim: ["arrowleft"],
+      yPosAim: ["arrowdown"],
+      yNegAim: ["arrowup"],
+      jumpKey: ["w"],
+      primaryActionKey: [" "],
+      secondaryActionKey: ["shift"],
+    })
+    createPlayer(inputDevice)
+  }
+}
+window.addEventListener("keydown", keydownHandler)
 
 // @ts-ignore
 window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
@@ -30,30 +59,8 @@ window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
   createPlayer(inputDevice)
 })
 
-let keyboardPlayerActive: boolean = false
-window.addEventListener("keydown", () => {
-  if (!keyboardPlayerActive) {
-    const inputDevice = new KeyboardInput(
-      ["d"],
-      ["a"],
-      ["s"],
-      ["w"],
-      ["arrowright"],
-      ["arrowleft"],
-      ["arrowdown"],
-      ["arrowup"],
-      [" "],
-      ["v"],
-      ["c"]
-      )
-    createPlayer(inputDevice)
-  }
-  keyboardPlayerActive = true
-})
-
 // @ts-ignore
 window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
-  // TODO: Test this with non-steam controller
   for (const p of players) {
     const gp = p.getInputDevice() as GamepadInput
     if (gp.getGamepadIndex() === e.gamepad.index) {
@@ -62,15 +69,8 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
   }
 })
 
-// window.addEventListener("click", (e) => {
-//   const W = window.innerWidth;
-//   const H = window.innerHeight;
-//   const fire = new Fire([e.pageX - W / 2, e.pageY - H / 2]);
-//   positionables.add(fire);
-// });
-
-const pausedText = " (Paused)"
-
+let lastAnimationFrameID: number
+let lastFrameTime: number
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
     cancelAnimationFrame(lastAnimationFrameID)
@@ -80,8 +80,6 @@ document.addEventListener("visibilitychange", () => {
     document.title = document.title.replace(pausedText, "")
   }
 })
-
-let lastFrameTime: number
 
 function gameLoop(timeStamp: number) {
   debugContainer.textContent = `fps ${calcFPS(
@@ -122,7 +120,9 @@ function gameLoop(timeStamp: number) {
     const scoreContainer =
       scoreboardContainer.children[Array.from(players).indexOf(p)]
 
-    scoreContainer.textContent = `${p.getScore().toString()}💩 ${p.getHealth()}❤`
+    scoreContainer.textContent = `${p
+      .getScore()
+      .toString()}💩 ${p.getHealth()}❤`
 
     const mv = p.getInputDevice().getMovementVector()
 
@@ -152,7 +152,7 @@ function gameLoop(timeStamp: number) {
   debugContainer.innerHTML += `
 Positionables: ${displaceables.size}`
   updateGameState(timeStamp)
-  render(timeStamp)
+  drawFrame(timeStamp)
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
   lastFrameTime = timeStamp
 }
@@ -163,7 +163,7 @@ function calcFPS(lastFrameTime: number, timestamp: number) {
 
 // Render
 
-function render(timeStamp: number) {
+function drawFrame(timeStamp: number) {
   ctx.fillStyle = "#000"
   ctx.fillRect(0, 0, ...getWH())
 
@@ -197,6 +197,7 @@ function updateGameState(timeStamp: number) {
     // Events that occur every second:
 
     if (isSecond) {
+      // TODO: Refactor modulo based events to us diffing instead
       if (player.getIsOnFire()) {
         player.damage(Fire.fireDamage)
       }
@@ -247,6 +248,7 @@ function updateGameState(timeStamp: number) {
     const [x, y] = d.getPosition()
     const [w, h] = d.getDimensions()
 
+    // TODO: Handle collisions differently for food, players and projectiles
     let xCollision = x < w / 2 || x > W - w / 2
     let yCollision = y < h / 2 || y > H - h / 2
 
@@ -296,9 +298,9 @@ function updateGameState(timeStamp: number) {
       if (d instanceof Poop && od instanceof Player) {
         // Stun player if they intersect with poop
         if (d.intersectsWith(od)) {
-          od.stun();
-          displaceables.delete(d);
-          break;
+          od.stun()
+          displaceables.delete(d)
+          break
         }
       }
 

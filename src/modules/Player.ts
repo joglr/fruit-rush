@@ -10,6 +10,7 @@ import {
   playerMinHorizontalVelocity,
   playerTurnStrength,
 } from "../config"
+import { playSFX } from "./sound"
 
 let currentHue = 0
 
@@ -19,16 +20,16 @@ function genHue(): number {
   return hue
 }
 
-const states = {
-  DEFAULT: '🐵',
-  STUNNED: '🙈',
-  EAT: '🙊'
+enum PlayerState {
+  DEFAULT = "🐵",
+  STUNNED = "🙈",
+  EAT = "🙊",
 }
 
 // const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
 export class Player extends Icon {
   private score = 0
-  icon = states.DEFAULT
+  icon = PlayerState.DEFAULT
 
   static initialHealth = 10
   playerNumber: number
@@ -45,11 +46,17 @@ export class Player extends Icon {
   draw(ctx: CanvasRenderingContext2D, timeStamp: number) {
     super.draw(ctx, timeStamp)
     ctx.fillStyle = this.getColor()
-    const [,h] = this.dimensions
-    const progress = this.getPrimaryActionEquipable().getProgress(timeStamp).toFixed(2)
+    const [, h] = this.dimensions
+    const progress = this.getPrimaryActionEquipable()
+      .getProgress(timeStamp)
+      .toFixed(2)
     ctx.font = `bold ${h / 2}px sans-serif`
-    const [x,y] = this.getPosition()
-    ctx.fillText(progress, x, y - this.getDimensions()[1] - playerIndicatorOffset)
+    const [x, y] = this.getPosition()
+    ctx.fillText(
+      progress,
+      x,
+      y - this.getDimensions()[1] - playerIndicatorOffset
+    )
     // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
@@ -69,22 +76,22 @@ export class Player extends Icon {
 
   eat(value: number) {
     playSFX("eat")
-    this.icon = states.EAT
+    this.icon = PlayerState.EAT
     this.resetIconTimeout = setTimeout(() => {
-      this.icon = states.DEFAULT
+      this.icon = PlayerState.DEFAULT
     }, 500)
     this.addToScore(value)
   }
 
   addToScore(amount: number) {
-    this.score += amount;
+    this.score += amount
   }
 
   resetScore() {
-    this.score = 0;
+    this.score = 0
   }
   getScore() {
-    return this.score;
+    return this.score
   }
 
   getColor() {
@@ -109,14 +116,14 @@ export class Player extends Icon {
   }
 
   stun() {
-    playSFX("hit");
+    playSFX("hit")
     this.damage(1)
     this.isStunned = true
     clearTimeout(this.resetIconTimeout)
-    this.icon = states.STUNNED
+    this.icon = PlayerState.STUNNED
     this.stunTimeout = setTimeout(() => {
       this.isStunned = false
-      this.icon = states.DEFAULT
+      this.icon = PlayerState.DEFAULT
     }, 2000)
   }
 
@@ -139,15 +146,14 @@ export class Player extends Icon {
   damage(amount: number) {
     const newHealth = Math.max(this.health - amount, 0)
     if (newHealth <= 0) {
-      this.dead = true;
-      this.health = 0;
-    }
-    else this.health = newHealth
+      this.dead = true
+      this.health = 0
+    } else this.health = newHealth
     // TODO: Handle player death
   }
 
   update() {
-    if (this.isStunned) return;
+    if (this.isStunned) return
     const velocityChange = this.getInputDevice()
       .getMovementVector()
       .multiply(playerTurnStrength)
@@ -155,6 +161,10 @@ export class Player extends Icon {
 
     this.v = this.v.add(velocityChange)
     super.update()
-    this.v = this.v.limitAxis(playerMinHorizontalVelocity, playerMaxHorizontalVelocity, Axis.X)
+    this.v = this.v.limitAxis(
+      playerMinHorizontalVelocity,
+      playerMaxHorizontalVelocity,
+      Axis.X
+    )
   }
 }

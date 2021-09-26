@@ -16,6 +16,7 @@ export interface InputDevice {
 }
 
 let initialized = false
+let keyboardInputInstance: KeyboardInput | null = null
 
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
@@ -42,9 +43,8 @@ export class GamepadInput implements InputDevice {
       startDelay: 0,
       duration: 100,
       weakMagnitude: 1,
-      strongMagnitude: 1
+      strongMagnitude: 1,
     })
-
   }
   getAimVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
@@ -55,47 +55,152 @@ export class GamepadInput implements InputDevice {
     return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
   getPrimaryActionButtonIsDown(): boolean {
-    return navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true
+    return (
+      navigator.getGamepads()[this.gamepadIndex]?.buttons[7].pressed === true
+    )
   }
 
   getJumpButtonIsDown(): boolean {
-    return navigator.getGamepads()[this.gamepadIndex]?.buttons[6].pressed === true
+    return (
+      navigator.getGamepads()[this.gamepadIndex]?.buttons[6].pressed === true
+    )
   }
 
   getSecondaryActionButtonIsDown(): boolean {
-    return navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
+    return (
+      navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
+    )
   }
 }
 
+// const preventDefaultKeys =
+
+type Key =
+  | "escape"
+  | "f1"
+  | "f2"
+  | "f3"
+  | "f4"
+  | "f5"
+  | "f6"
+  | "f7"
+  | "f8"
+  | "f9"
+  | "f10"
+  | "f11"
+  | "f12"
+  | "delete"
+  | "insert"
+  | "½"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9"
+  | "0"
+  | "+"
+  | "backspace"
+  | "enter"
+  | "å"
+  | "p"
+  | "o"
+  | "i"
+  | "u"
+  | "y"
+  | "t"
+  | "r"
+  | "e"
+  | "w"
+  | "q"
+  | "tab"
+  | "capslock"
+  | "a"
+  | "s"
+  | "d"
+  | "f"
+  | "g"
+  | "h"
+  | "j"
+  | "k"
+  | "l"
+  | "'"
+  | "shift"
+  | "_"
+  | "."
+  | ","
+  | "m"
+  | "n"
+  | "b"
+  | "v"
+  | "c"
+  | "x"
+  | "z"
+  | "<"
+  | "control"
+  | "meta"
+  | "alt"
+  | " "
+  | "altgraph"
+  | "arrowleft"
+  | "arrowdown"
+  | "arrowup"
+  | "arrowright"
+
 export class KeyboardInput implements InputDevice {
-  static downKeys = new Map()
-  static keyIsDown(keys: string[]): boolean {
+  static downKeys = new Map<Key, boolean>()
+  static keyIsDown(keys: Key[]): boolean {
     return keys.some((key) => Boolean(KeyboardInput.downKeys.get(key)))
   }
 
-  xPosKeys: string[]
-  xNegKeys: string[]
-  yPosKeys: string[]
-  yNegKeys: string[]
-  xPosAimKeys: string[]
-  xNegAimKeys: string[]
-  yPosAimKeys: string[]
-  yNegAimKeys: string[]
-  jumpKey: string[]
-  primaryActionKey: string[]
-  secondaryActionKey: string[]
+  allKeys: Key[]
+  xPosKeys: Key[]
+  xNegKeys: Key[]
+  yPosKeys: Key[]
+  yNegKeys: Key[]
+  xPosAimKeys: Key[]
+  xNegAimKeys: Key[]
+  yPosAimKeys: Key[]
+  yNegAimKeys: Key[]
+  jumpKey: Key[]
+  primaryActionKey: Key[]
+  secondaryActionKey: Key[]
 
-  constructor(
-    xPos: string[], xNeg: string[], yPos: string[], yNeg: string[],
-    xPosAim: string[], xNegAim: string[], yPosAim: string[], yNegAim: string[],
-    jumpKey: string[],
-    primaryActionKey: string[],
-    secondaryActionKey: string[],
-    ) {
+  constructor({
+    xPos = [],
+    xNeg = [],
+    yPos = [],
+    yNeg = [],
+    xPosAim = [],
+    xNegAim = [],
+    yPosAim = [],
+    yNegAim = [],
+    jumpKey = [],
+    primaryActionKey = [],
+    secondaryActionKey = [],
+  }: {
+    xPos?: Key[]
+    xNeg?: Key[]
+    yPos?: Key[]
+    yNeg?: Key[]
+    xPosAim?: Key[]
+    xNegAim?: Key[]
+    yPosAim?: Key[]
+    yNegAim?: Key[]
+    jumpKey?: Key[]
+    primaryActionKey?: Key[]
+    secondaryActionKey?: Key[]
+  }) {
     if (!initialized)
       throw new Error(
-        'Cannot construct KeyboardInput before init has been called'
+        "Cannot construct KeyboardInput before init has been called"
       )
+    if (keyboardInputInstance)
+      throw new Error("Cannot instantiate multiple KeyboardInput instances")
+    keyboardInputInstance = this
     this.xPosKeys = xPos
     this.xNegKeys = xNeg
     this.yPosKeys = yPos
@@ -107,6 +212,23 @@ export class KeyboardInput implements InputDevice {
     this.jumpKey = jumpKey
     this.primaryActionKey = primaryActionKey
     this.secondaryActionKey = secondaryActionKey
+    this.allKeys = [
+      ...this.xPosKeys,
+      ...this.xNegKeys,
+      ...this.yPosKeys,
+      ...this.yNegKeys,
+      ...this.xPosAimKeys,
+      ...this.xNegAimKeys,
+      ...this.yPosAimKeys,
+      ...this.yNegAimKeys,
+      ...this.jumpKey,
+      ...this.primaryActionKey,
+      ...this.secondaryActionKey,
+    ]
+  }
+
+  hasKey(key: Key) {
+    return this.allKeys.includes(key)
   }
 
   hapticFeedback(): void {
@@ -128,7 +250,7 @@ export class KeyboardInput implements InputDevice {
       (KeyboardInput.keyIsDown(this.xPosKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.xNegKeys) ? -1 : 0),
       (KeyboardInput.keyIsDown(this.yPosKeys) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0),
+        (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0)
     )
   }
   getAimVector(): Vector2 {
@@ -136,26 +258,27 @@ export class KeyboardInput implements InputDevice {
       (KeyboardInput.keyIsDown(this.xPosAimKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.xNegAimKeys) ? -1 : 0),
       (KeyboardInput.keyIsDown(this.yPosAimKeys) ? 1 : 0) +
-        (KeyboardInput.keyIsDown(this.yNegAimKeys) ? -1 : 0),
+        (KeyboardInput.keyIsDown(this.yNegAimKeys) ? -1 : 0)
     )
   }
 }
 
 export default function init(callback?: Function) {
   initialized = true
-  window.addEventListener('keydown', (evt) => {
-    // evt.preventDefault()
-    KeyboardInput.downKeys.set(evt.key.toLowerCase(), true)
+  window.addEventListener("keydown", (evt) => {
+    const key = evt.key.toLowerCase() as Key
+    if (keyboardInputInstance?.hasKey(key)) evt.preventDefault()
+    KeyboardInput.downKeys.set(key, true)
     if (callback) callback()
   })
-  window.addEventListener('keyup', (evt) => {
-    // evt.preventDefault()
-    KeyboardInput.downKeys.delete(evt.key.toLowerCase())
+  window.addEventListener("keyup", (evt) => {
+    const key = evt.key.toLowerCase() as Key
+    if (keyboardInputInstance?.hasKey(key)) evt.preventDefault()
+    KeyboardInput.downKeys.delete(key)
   })
 }
 
 // Use the value 0.5 to make moving with a controller comparable to using arrow keys
-const DEAD_ZONE_THRESHOLD = 0.1
 
 function normalizeToDeadZone(input: number): number {
   const sign = input < 0 ? -1 : 1
