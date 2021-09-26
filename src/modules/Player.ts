@@ -9,8 +9,7 @@ import {
   playerMaxHorizontalVelocity,
   playerMinHorizontalVelocity,
   playerTurnStrength,
-} from "./config"
-import { playSFX } from ".."
+} from "../config"
 
 let currentHue = 0
 

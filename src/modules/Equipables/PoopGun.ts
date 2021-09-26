@@ -2,8 +2,8 @@ import { Player } from "../Player";
 import { Equipable } from "../Equipable";
 import { Icon } from "../Icon";
 import { Displaceable } from "../Displaceable";
-import { gravityAmount, poopRecoilMultiplier, poopVelocity } from "../config";
-import { playSFX } from "../..";
+import { gravityAmount, poopRecoilMultiplier, poopVelocity } from "../../config";
+import { playSFX } from "../sound";
 
 export class PoopGun extends Equipable {
 

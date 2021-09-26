@@ -1,54 +1,17 @@
-import "./style.css"
-// import State from './modules/State'
-// import Gamepad from './modules/Gamepad'
-// const state = State()
-
-import init, {
-  KeyboardInput,
-  InputDevice,
-  GamepadInput,
-} from "./modules/InputDevice"
-import { Player } from "./modules/Player"
+import { gravityAmount, pausedText, playerJumpAmount } from "./config"
+import { playSFX } from "./modules/sound"
 import { Displaceable } from "./modules/Displaceable"
-import { randBetween, Vector2 } from "./modules/Math"
+import { Fire } from "./modules/Equipables/NotAFlameThrower"
 import { Poop } from "./modules/Equipables/PoopGun"
 import { Food } from "./modules/Food"
-import { Fire } from "./modules/Equipables/NotAFlameThrower"
-import {
-  gravityAmount,
-  playerJumpAmount,
-} from "./modules/config"
-
-// const mapConfig = {
-//   areaSize: 16,
-//   modelSize: 16,
-//   imageSize: 12,
-// };
-
-const getSoundPath = (x: string) => `./sounds/${x}.wav`
-
-const sounds = {
-  "jump": 0,
-  "hit": 1,
-  "shoot": 2,
-  "eat": 3,
-}
-
-
-const audios = Object.keys(sounds).map(s => {
-  const a = document.createElement("audio")
-  a.src = getSoundPath(s);
-
-  a.volume = 0.5
-
-  return () => {
-    a.pause()
-    a.currentTime = 0;
-    a.play()
-  }
-})
-
-export const playSFX = (key: keyof typeof sounds) => audios[sounds[key]]()
+// import State from './modules/State'
+// const state = State()
+import init, {
+  GamepadInput, InputDevice, KeyboardInput
+} from "./modules/InputDevice"
+import { randBetween, Vector2 } from "./modules/Math"
+import { Player } from "./modules/Player"
+import "./style.css"
 
 // const gameContainer = document.querySelector("#game")!;
 const debugContainer = document.querySelector("#debug")!

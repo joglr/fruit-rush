@@ -3,6 +3,7 @@
 //   KEYBOARD
 // }
 
+import { DEAD_ZONE_THRESHOLD } from "../config"
 import { UnitVector2, Vector2 } from "./Math"
 
 export interface InputDevice {
