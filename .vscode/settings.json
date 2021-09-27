@@ -1,3 +1,16 @@
 {
   "editor.formatOnSave": false,
+  "cSpell.enabled": true,
+  "cSpell.words": [
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
+    "arrowup",
+    "Displaceable",
+    "displaceables",
+    "Equipable",
+    "Equipables",
+    "gamepadconnected",
+    "gamepaddisconnected"
+  ],
 }

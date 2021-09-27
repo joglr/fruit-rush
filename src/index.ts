@@ -169,7 +169,7 @@ function drawFrame(timeStamp: number) {
 
   for (const p of displaceables) {
     p.draw(ctx, timeStamp)
-    // p.drawWithHitbox(ctx)
+    // p.drawWithHitBox(ctx)
   }
 }
 
@@ -268,7 +268,7 @@ function updateGameState(timeStamp: number) {
       } else {
         // Delete non-players when colliding with the ground
         const delFromPos = displaceables.delete(d)
-        if (!delFromPos) console.log("Unable to remove unreachable updateable")
+        if (!delFromPos) console.log("Unable to remove unreachable displaceable")
       }
     }
     for (const od of displaceables) {
