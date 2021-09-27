@@ -11,7 +11,7 @@
 
 <!-- Using poop costs 1 food -->
 
-Shoot cooldown indicator
+<!-- Shoot cooldown indicator -->
  - Rectangle above the player getting smaller
 
 Remote scoreboard - Show score above player instead
@@ -23,8 +23,7 @@ Special chili fruit shoots fire downwards
 
 Special fruit givets machine gun
 
-
-Bug: Can exit the sides
-Bug: Can get stuck ceiling
+<!-- Bug: Can exit the sides -->
+<!-- Bug: Can get stuck ceiling -->
 
 Stun cooldown indicator

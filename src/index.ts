@@ -251,22 +251,41 @@ function updateGameState(timeStamp: number) {
     const [w, h] = d.getDimensions()
 
     // TODO: Handle collisions differently for food, players and projectiles
-    let xCollision = x < w / 2 || x > W - w / 2
-    let yCollision = y < h / 2 || y > H - h / 2
+
+    const minX = w / 2
+    const minY = h / 2
+    const maxX = W - w / 2
+    const maxY = H - h / 2
+
+    let xCollision = x < minX || x > maxX
+    let yCollision = y < minY || y > maxY
 
     if (xCollision || yCollision) {
       if (d instanceof Player) {
+        let [px, py] = d.getP()
         let [vx, vy] = d.getV()
         if (xCollision) {
           vx *= -1
+          if (px < W / 2) px = minX
+          else px = maxX
         }
         if (yCollision) {
-          vy = 0
-          vx *= 0.7
+
+          if (py > maxY) {
+            py = maxY
+            vy = 0
+            vx *= 0.7
+          }
+          // if (py < minY)
+          // py = minY
+          // else py = maxY
         }
-        const v = Vector2.fromArray([vx, vy])
-        // .multiply(0.9);
+        const v = new Vector2(vx, vy)
+        const p = new Vector2(px, py)
+
         if (!v.is(d.getV())) d.setVelocity(v)
+        if (!p.is(d.getP())) d.setPosition(p)
+
       } else {
         // Delete non-players when colliding with the ground
         const delFromPos = displaceables.delete(d)
