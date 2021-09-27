@@ -31,7 +31,7 @@ window.addEventListener("resize", resizeHandler)
 let keyboardPlayerActive = false
 
 
-function keydownHandler(event: KeyboardEvent) {
+function keydownHandler() {
   if (!keyboardPlayerActive) {
     keyboardPlayerActive = true
     const inputDevice = new KeyboardInput({
@@ -45,9 +45,9 @@ function keydownHandler(event: KeyboardEvent) {
       xNegAim: ["arrowleft"],
       yPosAim: ["arrowdown"],
       yNegAim: ["arrowup"],
-      jumpKey: ["w"],
-      primaryActionKey: [" "],
-      secondaryActionKey: ["shift"],
+      jumpKey: [" "],
+      primaryActionKey: ["shift"],
+      secondaryActionKey: ["control"],
     })
     createPlayer(inputDevice)
   }
