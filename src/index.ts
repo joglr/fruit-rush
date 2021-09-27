@@ -19,6 +19,7 @@ const scoreboardContainer = document.querySelector("#scoreboard")!
 const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!
 
+const DEBUG = true
 
 function resizeHandler() {
   canvas.width = window.innerWidth
@@ -85,7 +86,8 @@ function gameLoop(timeStamp: number) {
   debugContainer.textContent = `fps ${calcFPS(
     lastFrameTime,
     timeStamp
-  ).toFixed()} (${Math.round(timeStamp)})`
+  ).toFixed()}`
+  if (DEBUG) debugContainer.textContent += `(${Math.round(timeStamp)})`
 
   const flooredTimeStamp = Math.round(timeStamp / 15)
 
@@ -134,7 +136,7 @@ function gameLoop(timeStamp: number) {
     const pv = p.getV().toArray().map(threeDecimals).toString()
     const pa = p.getA().toArray().map(threeDecimals).toString()
     //@ts-ignore
-    debugContainer.innerHTML +=
+    if (DEBUG) debugContainer.innerHTML +=
       "\n" +
       `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${p.icon}
   ${mvs} l: ${mv.getMagnitude()}
@@ -148,9 +150,9 @@ function gameLoop(timeStamp: number) {
   health: ${p.getHealth()}
   </div>`
   }
-  //@ts-ignore
-  debugContainer.innerHTML += `
-Positionables: ${displaceables.size}`
+
+  if (DEBUG) debugContainer.innerHTML += `
+Entities: ${displaceables.size}`
   updateGameState(timeStamp)
   drawFrame(timeStamp)
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
