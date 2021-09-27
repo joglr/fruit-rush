@@ -12,7 +12,7 @@
 <!-- Using poop costs 1 food -->
 
 <!-- Shoot cooldown indicator -->
- - Rectangle above the player getting smaller
+ <!-- - Rectangle above the player getting smaller -->
 
 Remote scoreboard - Show score above player instead
 

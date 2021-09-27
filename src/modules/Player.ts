@@ -45,18 +45,37 @@ export class Player extends Icon {
 
   draw(ctx: CanvasRenderingContext2D, timeStamp: number) {
     super.draw(ctx, timeStamp)
-    ctx.fillStyle = this.getColor()
-    const [, h] = this.dimensions
-    const progress = this.getPrimaryActionEquipable()
-      .getProgress(timeStamp)
-      .toFixed(2)
-    ctx.font = `bold ${h / 2}px sans-serif`
+    const progress = this.getPrimaryActionEquipable().getProgress(timeStamp)
+
+    if (progress < 1 && progress > 0) {
+      ctx.beginPath()
+      // ctx.fillStyle = "#fff"
+      ctx.fillStyle = `hsla(${this.getHue()}, 50%, 50%, 0.5)`
+
+      const center = this.getP().subtract(this.getDimensions().divide(1.5)).toArray()
+      const rotation = -Math.PI / 2
+      const start = -2 * Math.PI * (1 - progress)
+      const radius = this.getDimensions().getMagnitude() / 4
+      ctx.arc(...center, radius, rotation + start, rotation)
+      ctx.lineTo(...center)
+      ctx.fill()
+      // ctx.fillRect(
+      //   ...this.getP().subtract(this.getDimensions().divide(2)).toArray(),
+      //   (1 - progress) * w,
+      //   h / 10
+      // )
+    }
     const [x, y] = this.getPosition()
-    ctx.fillText(
-      progress,
-      x,
-      y - this.getDimensions()[1] - playerIndicatorOffset
-    )
+    if (this.getScore() > 0) {
+      const [,h] = this.dimensions
+      ctx.font = `bold ${h / 2}px sans-serif`
+      ctx.fillStyle = this.getColor()
+      ctx.fillText(
+        this.getScore().toString(),
+        x,
+        y - this.getDimensions()[1] - playerIndicatorOffset
+      )
+    }
     // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
