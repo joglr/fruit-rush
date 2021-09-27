@@ -14,7 +14,11 @@
 <!-- Shoot cooldown indicator -->
  <!-- - Rectangle above the player getting smaller -->
 
-Remote scoreboard - Show score above player instead
+Handle player death
+
+End state
+
+<!-- Remote scoreboard - Show score above player instead -->
 
 Special chili fruit shoots fire downwards
   - Random uncontrollable fire downwards
@@ -27,3 +31,4 @@ Special fruit givets machine gun
 <!-- Bug: Can get stuck ceiling -->
 
 Stun cooldown indicator
+
