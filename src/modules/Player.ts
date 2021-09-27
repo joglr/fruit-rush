@@ -8,7 +8,9 @@ import {
   playerIndicatorOffset,
   playerMaxHorizontalVelocity,
   playerMinHorizontalVelocity,
+  playerStunDuration,
   playerTurnStrength,
+  poopGunCoolDown,
 } from "../config"
 import { playSFX } from "./sound"
 
@@ -84,7 +86,7 @@ export class Player extends Icon {
 
   private health: number = Player.initialHealth
   private isOnFire: boolean = false
-  private primaryActionEquipable = new PoopGun(2000)
+  private primaryActionEquipable = new PoopGun(poopGunCoolDown)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
   constructor(playerNumber: number, inputDevice: InputDevice) {
@@ -143,7 +145,7 @@ export class Player extends Icon {
     this.stunTimeout = setTimeout(() => {
       this.isStunned = false
       this.icon = PlayerState.DEFAULT
-    }, 2000)
+    }, playerStunDuration)
   }
 
   extinguish() {
