@@ -252,10 +252,14 @@ function updateGameState(timeStamp: number) {
 
     // TODO: Handle collisions differently for food, players and projectiles
 
-    const minX = w / 2
-    const minY = h / 2
-    const maxX = W - w / 2
-    const maxY = H - h / 2
+    const factor = (d instanceof Food || d instanceof Poop) ? - 1 : 1
+    const xOffset = factor * w / 2
+    const yOffset = factor * h / 2
+
+    const minX = xOffset
+    const minY = yOffset
+    const maxX = W - xOffset
+    const maxY = H - yOffset
 
     let xCollision = x < minX || x > maxX
     let yCollision = y < minY || y > maxY
