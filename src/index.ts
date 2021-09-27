@@ -19,7 +19,7 @@ const scoreboardContainer = document.querySelector("#scoreboard")!
 const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!
 
-const DEBUG = true
+const DEBUG = window.location.hash.includes("debug")
 
 function resizeHandler() {
   canvas.width = window.innerWidth
