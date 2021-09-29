@@ -3,12 +3,14 @@
 export const DEAD_ZONE_THRESHOLD = 0.1
 
 
+export const POSITIONABLE_SIZE = 50
+
 export const pausedText = " (Paused)";
 
 export const gravityAmount = 0.3;
 export const poopVelocity = 5;
-export const poopRecoilMultiplier = 1.4
-export const poopGunCoolDown = 500
+export const poopRecoilMultiplier = 2.0
+export const poopGunCoolDown = 800
 export const diarrheaRecoilMultiplier = 0.5
 export const playerStunDuration = 1000
 
@@ -17,6 +19,6 @@ export const playerMinHorizontalVelocity = -7;
 export const playerMaxHorizontalVelocity = 7;
 export const playerMinVerticalVelocity = 0;
 export const playerMaxVerticalVelocity = Infinity
-export const playerTurnStrength = 2
+export const playerTurnStrength = 1.5
 export const playerIndicatorFontSize = 30
-export const playerIndicatorOffset = 0
+export const playerCoolDownIndicatorOffset = 1 / 4
