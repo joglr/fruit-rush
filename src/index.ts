@@ -120,7 +120,7 @@ function gameLoop(timeStamp: number) {
     }
   }
 
-  const playersAlive = Array.from(players).filter((p) => p.dead).length
+  const playersAlive = Array.from(players).filter((p) => !p.dead).length
 
   for (const p of players) {
     const scoreContainer =
@@ -195,6 +195,7 @@ function gameLoop(timeStamp: number) {
   a: ${pa}
   j: ${p.getInputDevice().getJumpButtonIsDown()}
   s: ${p.isStunned}
+  d: ${p.hasDiarrhea}
   isOnFire: ${p.getIsOnFire()}
   health: ${p.getHealth()}
   </div>`
@@ -380,24 +381,14 @@ function updateGameState(timeStamp: number) {
         }
       }
 
-      // 🍌 -> 🐵
+      // Food -> 🐵
       if (d instanceof Food && od instanceof Player) {
-        // Heal player if they intersect with Eucalyptus
+        // Affect player by the consumed food
         if (
           d.intersectsWith(od)
-          //  && op.getHealth() < Player.initialHealth
         ) {
-          // if (BAD.includes(d.icon)) {
-          //   od.hasDiarrhea = true
-          //   setTimeout(() => {
-          //     od.hasDiarrhea = false;
-          //   }, 2000)
-          //   // playSFX("kebab")
-          //   // TODO: Dihrearea
-          // }
-          od.eat(1)
+          d.affect(od)
           displaceables.delete(d)
-
           break
         }
       }
