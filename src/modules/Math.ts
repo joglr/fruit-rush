@@ -41,9 +41,10 @@ export class Vector2 {
     return [this[0], this[1]]
   }
 
-  setComponents([x, y]: [number, number]) {
+  setComponents([x, y]: [number, number]): this {
     this[0] = x
     this[1] = y
+    return this
   }
 
   isNullVector() {

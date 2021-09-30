@@ -2,7 +2,7 @@ import { Player } from "../Player";
 import { Equipable } from "../Equipable";
 import { Icon } from "../Icon";
 import { Displaceable } from "../Displaceable";
-import { gravityAmount, poopRecoilMultiplier, poopVelocity } from "../../config";
+import { poopRecoilMultiplier, poopVelocity } from "../../config";
 import { playSFX } from "../sound";
 
 export class PoopGun extends Equipable {
@@ -23,7 +23,10 @@ export class PoopGun extends Equipable {
     // Recoil
     p.setVelocity(p.getV().add(pv.flip().multiply(poopVelocity * poopRecoilMultiplier)))
 
-    return new Poop([0, gravityAmount], wv.toArray(), p.getP().add(p.getDimensions().setDirection(pv).multiply(1)).toArray())
+    return new Poop(
+      p.getP().add(p.getDimensions().setDirection(pv).multiply(1)).toArray(),
+      wv.toArray()
+    )
   }
 }
 

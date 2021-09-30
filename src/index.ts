@@ -38,9 +38,7 @@ function keydownHandler() {
       xPos: ["d"],
       xNeg: ["a"],
       // yPos: ["s", ],
-      yNeg: [
-        /*"w"*/
-      ],
+      // yNeg: [ "w" ],
       xPosAim: ["arrowright"],
       xNegAim: ["arrowleft"],
       yPosAim: ["arrowdown"],
@@ -119,16 +117,26 @@ function gameLoop(timeStamp: number) {
     displaceables.add(food)
   }
 
+  // const playersAlive = players.
+
   for (const p of players) {
-    if (p.dead) {
-      // TODO: Handle dead player
-    }
+
     const scoreContainer =
       scoreboardContainer.children[Array.from(players).indexOf(p)]
 
-    scoreContainer.textContent = `${p
-      .getScore()
-      .toString()}💩 ${p.getHealth()}❤`
+    if (p.dead) {
+      scoreContainer.textContent = "DEAD"
+      if (p.justDied) {
+        p.justDied = false
+
+      }
+    }
+    //  else {
+    //   scoreContainer.textContent = `${p
+    //     .getScore()
+    //     .toString()}💩 ${p.getHealth()}❤`
+    // }
+
 
     const mv = p.getInputDevice().getMovementVector()
 
@@ -174,8 +182,8 @@ function drawFrame(timeStamp: number) {
   ctx.fillRect(0, 0, ...getWH())
 
   for (const p of displaceables) {
-    p.draw(ctx, timeStamp)
-    // p.drawWithHitBox(ctx)
+    if (DEBUG) p.drawWithHitBox(ctx, timeStamp)
+    else p.draw(ctx, timeStamp)
   }
 }
 
@@ -213,7 +221,7 @@ function updateGameState(timeStamp: number) {
       const [, H] = getWH()
       const [, h] = player.getDimensions()
       const distFromBottom = H - h / 2 - player.getP()[1]
-      const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0
+      const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
 
       if (canJump) {
         playSFX("jump")
@@ -251,7 +259,7 @@ function updateGameState(timeStamp: number) {
 
   for (const d of displaceables) {
     d.update()
-    const [x, y] = d.getPosition()
+    let [x, y] = d.getPosition()
     const [w, h] = d.getDimensions()
 
     // TODO: Handle collisions differently for food, players and projectiles
@@ -270,37 +278,38 @@ function updateGameState(timeStamp: number) {
 
     if (xCollision || yCollision) {
       if (d instanceof Player) {
-        let [px, py] = d.getP()
         let [vx, vy] = d.getV()
         if (xCollision) {
           vx *= -1
-          if (px < W / 2) px = minX
-          else px = maxX
+          if (x < W / 2) x = minX
+          else x = maxX
         }
         if (yCollision) {
 
-          if (py > maxY) {
-            py = maxY
+          if (y > maxY) {
+            y = maxY
             vy = 0
             vx *= 0.7
           }
-          // if (py < minY)
-          // py = minY
-          // else py = maxY
         }
         const v = new Vector2(vx, vy)
-        const p = new Vector2(px, py)
+        const p = new Vector2(x, y)
 
         if (!v.is(d.getV())) d.setVelocity(v)
         if (!p.is(d.getP())) d.setPosition(p)
 
       } else {
         // Delete non-players when colliding with the ground
+        if(d instanceof Food && y < minY) continue;
+        // TODO: Recycle Food, but at new positions
         const delFromPos = displaceables.delete(d)
         if (!delFromPos) console.log("Unable to remove unreachable displaceable")
       }
     }
     for (const od of displaceables) {
+      if (od instanceof  Player && od.dead) {
+        continue;
+      }
       // // 💦 -> 🔥
       // if (d instanceof Poop && op instanceof Fire) {
       //   // Extinguish fire with water if they intersect
