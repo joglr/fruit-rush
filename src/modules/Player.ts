@@ -80,7 +80,7 @@ export class Player extends Icon {
       ctx.font = `bold ${h / 2}px sans-serif`
       ctx.fillStyle = this.getColor()
       ctx.fillText(
-        `${this.getScore().toString()}🍌 ${this.getHealth()}❤`,
+        `${this.getScore().toString()}🍌 ${this.getHealth()}💗`,
         x,
         y - this.getDimensions()[1]
       )

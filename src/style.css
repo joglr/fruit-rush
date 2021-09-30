@@ -49,3 +49,9 @@ body {
   font-weight: bold;
   font-size: 40px;
 }
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

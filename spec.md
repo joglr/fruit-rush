@@ -38,3 +38,11 @@ Default aim direction
 <!-- Bug: Can get stuck ceiling -->
 
 
+score ned til bunden fordi man ikke får set det i toppen
+jord
+statistik over player the game, hvor mangefrugt og aqquracy
+der kommer stadig ild
+waves + pause hvor man kan købe ting for de frugter man ikke fik brugt
+Waves on time, shop where you buy with fruit
+
+Dead player = ghost -> can poision fruits

@@ -1,13 +1,16 @@
-import { gravityAmount, pausedText, playerJumpAmount } from "./config"
+import { fruitMargin, gravityAmount, pausedText, playerJumpAmount } from "./config"
 import { playSFX } from "./modules/sound"
 import { Displaceable } from "./modules/Displaceable"
 import { Fire } from "./modules/Equipables/NotAFlameThrower"
 import { Poop } from "./modules/Equipables/PoopGun"
 import { Food } from "./modules/Food"
+import confetti from "canvas-confetti"
 // import State from './modules/State'
 // const state = State()
 import init, {
-  GamepadInput, InputDevice, KeyboardInput
+  GamepadInput,
+  InputDevice,
+  KeyboardInput,
 } from "./modules/InputDevice"
 import { randBetween, Vector2 } from "./modules/Math"
 import { Player } from "./modules/Player"
@@ -16,8 +19,10 @@ import "./style.css"
 // const gameContainer = document.querySelector("#game")!;
 const debugContainer = document.querySelector("#debug")!
 const scoreboardContainer = document.querySelector("#scoreboard")!
-const canvas = document.querySelector("#game > canvas")! as HTMLCanvasElement
+const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!
+
+let gameOver = false
 
 const DEBUG = window.location.hash.includes("debug")
 
@@ -29,7 +34,6 @@ resizeHandler()
 window.addEventListener("resize", resizeHandler)
 
 let keyboardPlayerActive = false
-
 
 function keydownHandler() {
   if (!keyboardPlayerActive) {
@@ -106,21 +110,19 @@ function gameLoop(timeStamp: number) {
     //   const water = new Water([x, y], [0,0]);
     //   positionables.add(water);
     //   gameContainer?.appendChild(water.getDOMElement());
-    const margin = 50
 
-    const x = randBetween(margin, W - margin)
-    const food = new Food(
-      [x, -margin],
-      [0, 0],
-      [0, gravityAmount / 10],
-    )
-    displaceables.add(food)
+    if (!gameOver) {
+
+
+      const x = randBetween(fruitMargin, W - fruitMargin)
+      const food = new Food([x, - fruitMargin], [0, 0], [0, gravityAmount / 10])
+      displaceables.add(food)
+    }
   }
 
-  // const playersAlive = players.
+  const playersAlive = Array.from(players).filter((p) => p.dead).length
 
   for (const p of players) {
-
     const scoreContainer =
       scoreboardContainer.children[Array.from(players).indexOf(p)]
 
@@ -128,7 +130,42 @@ function gameLoop(timeStamp: number) {
       scoreContainer.textContent = "DEAD"
       if (p.justDied) {
         p.justDied = false
+        if (playersAlive === 1) {
+          gameOver = true
+          const duration = 15 * 1000
+          const animationEnd = Date.now() + duration
+          const defaults = {
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            zIndex: 0,
+          }
 
+          function randomInRange(min: number, max: number) {
+            return Math.random() * (max - min) + min
+          }
+
+          const interval = setInterval(function () {
+            const timeLeft = animationEnd - Date.now()
+
+            if (timeLeft <= 0) {
+              return clearInterval(interval)
+            }
+
+            const particleCount = 50 * (timeLeft / duration)
+            // since particles fall down, start a bit higher than random
+            confetti({
+              ...defaults,
+              particleCount,
+              origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            })
+            confetti({
+              ...defaults,
+              particleCount,
+              origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            })
+          }, 250)
+        }
       }
     }
     //  else {
@@ -136,7 +173,6 @@ function gameLoop(timeStamp: number) {
     //     .getScore()
     //     .toString()}💩 ${p.getHealth()}❤`
     // }
-
 
     const mv = p.getInputDevice().getMovementVector()
 
@@ -148,9 +184,10 @@ function gameLoop(timeStamp: number) {
     const pv = p.getV().toArray().map(threeDecimals).toString()
     const pa = p.getA().toArray().map(threeDecimals).toString()
     //@ts-ignore
-    if (DEBUG) debugContainer.innerHTML +=
-      "\n" +
-      `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${p.icon}
+    if (DEBUG)
+      debugContainer.innerHTML +=
+        "\n" +
+        `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${p.icon}
   ${mvs} l: ${mv.getMagnitude()}
   aim: ${av}
   p: ${pp}
@@ -163,7 +200,8 @@ function gameLoop(timeStamp: number) {
   </div>`
   }
 
-  if (DEBUG) debugContainer.innerHTML += `
+  if (DEBUG)
+    debugContainer.innerHTML += `
 Entities: ${displaceables.size}`
   updateGameState(timeStamp)
   drawFrame(timeStamp)
@@ -212,16 +250,17 @@ function updateGameState(timeStamp: number) {
 
     if (isSecond) {
       // TODO: Refactor modulo based events to us diffing instead
-      if (player.getIsOnFire()) {
-        player.damage(Fire.fireDamage)
-      }
+      // if (player.getIsOnFire()) {
+      //   player.damage(Fire.fireDamage)
+      // }
     }
 
     if (player.getInputDevice().getJumpButtonIsDown()) {
       const [, H] = getWH()
       const [, h] = player.getDimensions()
       const distFromBottom = H - h / 2 - player.getP()[1]
-      const canJump = distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
+      const canJump =
+        distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
 
       if (canJump) {
         playSFX("jump")
@@ -264,9 +303,9 @@ function updateGameState(timeStamp: number) {
 
     // TODO: Handle collisions differently for food, players and projectiles
 
-    const factor = (d instanceof Food || d instanceof Poop) ? - 1 : 1
-    const xOffset = factor * w / 2
-    const yOffset = factor * h / 2
+    const factor = d instanceof Food || d instanceof Poop ? -1 : 1
+    const xOffset = (factor * w) / 2
+    const yOffset = (factor * h) / 2
 
     const minX = xOffset
     const minY = yOffset
@@ -285,7 +324,6 @@ function updateGameState(timeStamp: number) {
           else x = maxX
         }
         if (yCollision) {
-
           if (y > maxY) {
             y = maxY
             vy = 0
@@ -297,18 +335,18 @@ function updateGameState(timeStamp: number) {
 
         if (!v.is(d.getV())) d.setVelocity(v)
         if (!p.is(d.getP())) d.setPosition(p)
-
       } else {
         // Delete non-players when colliding with the ground
-        if(d instanceof Food && y < minY) continue;
+        if (d instanceof Food && y < minY) continue
         // TODO: Recycle Food, but at new positions
         const delFromPos = displaceables.delete(d)
-        if (!delFromPos) console.log("Unable to remove unreachable displaceable")
+        if (!delFromPos)
+          console.log("Unable to remove unreachable displaceable")
       }
     }
     for (const od of displaceables) {
-      if (od instanceof  Player && od.dead) {
-        continue;
+      if (od instanceof Player && od.dead) {
+        continue
       }
       // // 💦 -> 🔥
       // if (d instanceof Poop && op instanceof Fire) {
@@ -335,7 +373,7 @@ function updateGameState(timeStamp: number) {
       // 💩 -> 🐵
       if (d instanceof Poop && od instanceof Player) {
         // Stun player if they intersect with poop
-        if (d.intersectsWith(od)) {
+        if (d.intersectsWith(od) && !od.isStunned) {
           od.stun()
           displaceables.delete(d)
           break
@@ -375,7 +413,11 @@ init()
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function createPlayer(inputDevice: InputDevice) {
-  const player = new Player(players.size, inputDevice, (getWH().map((x) => x / 2)) as [number, number])
+  const player = new Player(
+    players.size,
+    inputDevice,
+    getWH().map((x) => x / 2) as [number, number]
+  )
 
   players.add(player)
   const playerScore = document.createElement("div")

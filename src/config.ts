@@ -23,3 +23,4 @@ export const playerTurnStrength = 1.5
 export const playerIndicatorFontSize = 30
 export const playerCoolDownIndicatorOffset = 1 / 4
 export const playerInitialHealth = 10
+export const fruitMargin = 50
