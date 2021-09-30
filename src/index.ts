@@ -271,8 +271,8 @@ function updateGameState(timeStamp: number) {
     }
 
     if (
-      player.getInputDevice().getPrimaryActionButtonIsDown() &&
-      (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+      player.getInputDevice().getPrimaryActionButtonIsDown()
+      //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
     ) {
       const thing = player.getPrimaryActionEquipable().use(player, timeStamp)
       if (thing) {

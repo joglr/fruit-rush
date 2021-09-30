@@ -17,14 +17,17 @@ export class PoopGun extends Equipable {
     this.setLastUsed(currentTime)
     playSFX("shoot")
     p.getInputDevice().hapticFeedback();
-    const pv = p.getInputDevice().getAimVector()
-    const wv = pv.setMagnitude(poopVelocity + p.getV().getMagnitude())
+    let v = p.getInputDevice().getAimVector()
+    if (v.isNullVector()) v = p.getV()
+    if (v.isNullVector()) return // TODO: Save last velocity / move direction
+
+    const wv = v.setMagnitude(poopVelocity + p.getV().getMagnitude())
 
     // Recoil
-    p.setVelocity(p.getV().add(pv.flip().multiply(poopVelocity * poopRecoilMultiplier)))
+    p.setVelocity(p.getV().add(wv.flip().multiply(poopRecoilMultiplier)))
 
     return new Poop(
-      p.getP().add(p.getDimensions().setDirection(pv).multiply(1)).toArray(),
+      p.getP().add(p.getDimensions().setDirection(v).multiply(1)).toArray(),
       wv.toArray()
     )
   }
