@@ -50,7 +50,7 @@ const tacoEffect = (p: Player) => {
   })
   // TODO: Taco sound
   // playSFX("kebab")
-  // TODO: Dihrearea
+  // TODO: Dihrearea effect
 }
 
 const foodMap: Map<FOOD, FoodProperties> = new Map<FOOD, FoodProperties>([
