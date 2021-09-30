@@ -111,7 +111,11 @@ function gameLoop(timeStamp: number) {
     const margin = 50
 
     const x = randBetween(margin, W - margin)
-    const food = new Food([0, gravityAmount / 10], [0, 0], [x, margin])
+    const food = new Food(
+      [x, -margin],
+      [0, 0],
+      [0, gravityAmount / 10],
+    )
     displaceables.add(food)
   }
 
@@ -362,8 +366,8 @@ init()
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function createPlayer(inputDevice: InputDevice) {
-  const player = new Player(players.size, inputDevice)
-  player.setPosition(Vector2.fromArray(getWH().map((x) => x / 2)))
+  const player = new Player(players.size, inputDevice, (getWH().map((x) => x / 2)) as [number, number])
+
   players.add(player)
   const playerScore = document.createElement("div")
   playerScore.style.color = player.getColor()

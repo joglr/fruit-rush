@@ -1,10 +1,20 @@
-import { POSITIONABLE_SIZE } from "./settings"
 import { Vector2 } from "./Math"
+import { Box } from "./Box"
+import { gravityAmount } from "../config"
 
-export abstract class Displaceable {
-  protected p: Vector2
+export abstract class Displaceable extends Box {
   protected v: Vector2
   protected a: Vector2
+
+  constructor(
+    p: [number, number],
+    v: [number, number] = [0, 0],
+    a: [number, number] = [0, gravityAmount],
+  ) {
+    super(p)
+    this.v = Vector2.fromArray(v)
+    this.a = Vector2.fromArray(a)
+  }
 
   abstract draw(ctx: CanvasRenderingContext2D, timeStamp: number): void
   drawWithHitBox(ctx: CanvasRenderingContext2D, timeStamp: number) {
@@ -19,9 +29,7 @@ export abstract class Displaceable {
     return "red"
   }
 
-  getP() {
-    return this.p
-  }
+
   getV() {
     return this.v
   }
@@ -53,50 +61,22 @@ export abstract class Displaceable {
     this.v = newV
   }
 
-  protected dimensions: Vector2 = Vector2.fromArray([
-    POSITIONABLE_SIZE,
-    POSITIONABLE_SIZE,
-  ])
-
-  constructor(
-    a: [number, number],
-    v: [number, number] = [0, 0],
-    p: [number, number] = [0, 0]
-  ) {
-    this.p = Vector2.fromArray(p)
-    this.v = Vector2.fromArray(v)
-    this.a = Vector2.fromArray(a)
-  }
-
-  setPosition(position: Vector2) {
-    this.p = position
-  }
-
-  setVelocity(velocity: Vector2) {
+  setVelocity(velocity: Vector2): this {
     this.v = velocity
+    return this
   }
 
-  setAcceleration(acceleration: Vector2) {
+  setAcceleration(acceleration: Vector2): this {
     this.a = acceleration
+    return this
   }
 
-  getDimensions(): Vector2 {
-    return this.dimensions
-  }
-
-  setDimensions(dimensions: Vector2): void {
-    this.dimensions = dimensions
-  }
-  setDimensionsFromTuple(dimensions: [number, number]): void {
-    this.dimensions = Vector2.fromArray(dimensions)
-  }
-
-  intersectsWith(p: Displaceable): boolean {
+  intersectsWith(b: Box): boolean {
     const [aw, ah] = this.getDimensions().toArray()
-    const [bw, bh] = p.getDimensions().toArray()
+    const [bw, bh] = b.getDimensions().toArray()
 
     let [minAx, minAy] = this.p.toArray()
-    let [minBx, minBy] = p.getP().toArray()
+    let [minBx, minBy] = b.getP().toArray()
     let [maxAx, maxAy] = [minAx + aw, minAy + ah]
     let [maxBx, maxBy] = [minBx + bw, minBy + bh]
 
