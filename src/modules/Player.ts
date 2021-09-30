@@ -175,6 +175,7 @@ export class Player extends Icon {
   }
 
   damage(amount: number, callback: () => void) {
+    this.getInputDevice().hapticFeedback();
     const newHealth = Math.max(this.health - amount, 0)
     if (newHealth <= 0) {
       clearTimeout(this.stunTimeout)
