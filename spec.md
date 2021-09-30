@@ -56,4 +56,5 @@
 - statistik over player the game, hvor mangefrugt og aqquracy
 - Bug: der kommer stadig ild
 - Timed Waves + pause hvor man kan købe ting for de frugter man ikke fik brugt
+- Aim indicator for keyboard users or
 - Keyboard Player aim with mouse
