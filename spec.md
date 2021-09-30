@@ -46,3 +46,5 @@ waves + pause hvor man kan købe ting for de frugter man ikke fik brugt
 Waves on time, shop where you buy with fruit
 
 Dead player = ghost -> can poision fruits
+
+TODO: Handle controller disconnect
