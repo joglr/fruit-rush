@@ -42,6 +42,7 @@ const defaultEffect = (p: Player) => {
 }
 
 const tacoEffect = (p: Player) => {
+  playSFX("eat_bad")
   p.damage(tacoDamage, () => {
     p.hasDiarrhea = true
     setTimeout(() => {

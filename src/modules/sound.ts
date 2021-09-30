@@ -5,6 +5,7 @@ const sounds = {
   hit: 1,
   shoot: 2,
   eat: 3,
+  eat_bad: 4,
   // "kebab": 4
 };
 const audios = Object.keys(sounds).map((s) => {
