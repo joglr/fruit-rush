@@ -14,9 +14,9 @@
 <!-- Shoot cooldown indicator -->
  <!-- - Rectangle above the player getting smaller -->
 
-Handle player death
+<!-- Handle player death -->
 
-End state
+<!-- End state -->
 
 <!-- Remote scoreboard - Show score above player instead -->
 
