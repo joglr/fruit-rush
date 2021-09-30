@@ -1,5 +1,8 @@
+import { tacoDamage, tacoEffectDuration } from "../config"
 import { Icon } from "./Icon"
 import { pick, Vector2 } from "./Math"
+import { Player, PlayerState } from "./Player"
+import { playSFX } from "./sound"
 
 type FOOD =
   | "🍌"
@@ -18,46 +21,61 @@ type FOOD =
   | "🍋"
   | "🍐"
   | "🥭"
+  | "🌮"
+
+interface FoodProperties {
+  size: [number, number]
+  effect: Function
+  points: number
+}
 
 const multiplier = 4
 
-const sizeMap: Map<FOOD, [number, number]> = new Map<FOOD, [number, number]>([
-  ["🍌", [13, 13]],
-  ["🍎", [10, 10]],
-  ["🍏", [10, 10]],
-  ["🍇", [10, 10]],
-  ["🍈", [17, 17]],
-  ["🍉", [17, 17]],
-  ["🍊", [10, 10]],
-  ["🍍", [20, 20]],
-  ["🍑", [10, 10]],
-  ["🍒", [10, 10]],
-  ["🍓", [8, 8]],
-  ["🥑", [10, 10]],
-  ["🥝", [9, 9]],
-  ["🍋", [10, 10]],
-  ["🍐", [10, 10]],
-  ["🥭", [10, 10]],
+
+const defaultEffect = (p: Player) => {
+  playSFX("eat")
+  p.icon = PlayerState.EAT
+  p.resetIconTimeout = setTimeout(() => {
+    p.icon = PlayerState.DEFAULT
+  }, 500)
+  p.addToScore(1)
+}
+
+const tacoEffect = (p: Player) => {
+  p.damage(tacoDamage, () => {
+    p.hasDiarrhea = true
+    setTimeout(() => {
+      p.hasDiarrhea = false;
+    }, tacoEffectDuration)
+  })
+  // TODO: Taco sound
+  // playSFX("kebab")
+  // TODO: Dihrearea
+}
+
+const foodMap: Map<FOOD, FoodProperties> = new Map<FOOD, FoodProperties>([
+  ["🍌", { size: [13, 13], points: 1, effect: defaultEffect }],
+  ["🍎", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍏", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍇", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍈", { size: [17, 17], points: 1, effect: defaultEffect }],
+  ["🍉", { size: [17, 17], points: 1, effect: defaultEffect }],
+  ["🍊", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍍", { size: [20, 20], points: 1, effect: defaultEffect }],
+  ["🍑", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍒", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍓", { size: [8, 8], points: 1, effect: defaultEffect }],
+  ["🥑", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🥝", { size: [9, 9], points: 1, effect: defaultEffect }],
+  ["🍋", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🍐", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🥭", { size: [10, 10], points: 1, effect: defaultEffect }],
+  ["🌮", { size: [10, 10], points: 1, effect: tacoEffect }],
 ])
 
 export class Food extends Icon {
-  icon = pick<FOOD>([
-    "🍌",
-    "🍎",
-    "🍏",
-    "🍇",
-    "🍈",
-    "🍉",
-    "🍊",
-    "🍍",
-    "🍑",
-    "🍒",
-    "🍓",
-    "🥑",
-    "🥝",
-    "🍋",
-    "🍐",
-    "🥭",
-  ])
-  dimensions = Vector2.fromArray(sizeMap.get(this.icon)!.map(x => x * multiplier))
+  icon = pick<FOOD>(Array.from(foodMap.keys()))
+  private properties = foodMap.get(this.icon)
+  dimensions = Vector2.fromArray(this.properties!.size.map(x => x * multiplier))
+  affect = this.properties!.effect
 }

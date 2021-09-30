@@ -22,7 +22,7 @@ function genHue(): number {
   return hue
 }
 
-enum PlayerState {
+export enum PlayerState {
   DEFAULT = "🐵",
   STUNNED = "🙈",
   EAT = "🙊",
@@ -103,6 +103,7 @@ export class Player extends Icon {
   }
 
   eat(value: number) {
+
     playSFX("eat")
     this.icon = PlayerState.EAT
     this.resetIconTimeout = setTimeout(() => {
@@ -145,15 +146,16 @@ export class Player extends Icon {
 
   stun() {
     playSFX("hit")
-    this.damage(1)
-    if (this.dead) return
-    this.isStunned = true
-    this.icon = PlayerState.STUNNED
+    this.damage(1, () => {
+      this.isStunned = true
+      this.icon = PlayerState.STUNNED
 
-    this.stunTimeout = setTimeout(() => {
-      this.isStunned = false
-      this.icon = PlayerState.DEFAULT
-    }, playerStunDuration)
+      this.stunTimeout = setTimeout(() => {
+        this.isStunned = false
+        this.icon = PlayerState.DEFAULT
+      }, playerStunDuration)
+    })
+
   }
 
   extinguish() {
@@ -172,7 +174,7 @@ export class Player extends Icon {
     this.health = Math.min(this.health + amount, playerInitialHealth)
   }
 
-  damage(amount: number) {
+  damage(amount: number, callback: () => void) {
     const newHealth = Math.max(this.health - amount, 0)
     if (newHealth <= 0) {
       clearTimeout(this.stunTimeout)
@@ -181,7 +183,10 @@ export class Player extends Icon {
       this.justDied = true
       this.health = 0
       this.icon = PlayerState.DEAD
-    } else this.health = newHealth
+    } else {
+      this.health = newHealth
+      callback()
+    }
   }
 
   update() {
