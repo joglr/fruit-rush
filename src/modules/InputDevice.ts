@@ -253,7 +253,7 @@ export class KeyboardInput implements InputDevice {
         (KeyboardInput.keyIsDown(this.yNegKeys) ? -1 : 0)
     )
   }
-  getAimVector(): Vector2 {
+  getAimVector(): UnitVector2 {
     return new Vector2(
       (KeyboardInput.keyIsDown(this.xPosAimKeys) ? 1 : 0) +
         (KeyboardInput.keyIsDown(this.xNegAimKeys) ? -1 : 0),
