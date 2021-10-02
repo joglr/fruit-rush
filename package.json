@@ -19,9 +19,9 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/joglr/shadows/issues"
+    "url": "https://github.com/joglr/monkey/issues"
   },
-  "homepage": "https://github.com/joglr/shadows#readme",
+  "homepage": "https://github.com/joglr/monkey#readme",
   "dependencies": {
     "@types/canvas-confetti": "^1.4.2",
     "canvas-confetti": "^1.4.0"
