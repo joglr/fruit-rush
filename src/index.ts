@@ -256,40 +256,44 @@ function updateGameState(timeStamp: number) {
       // }
     }
 
-    if (player.getInputDevice().getJumpButtonIsDown()) {
-      const [, H] = getWH()
-      const [, h] = player.getDimensions()
-      const distFromBottom = H - h / 2 - player.getP()[1]
-      const canJump =
-        distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
+    // Player actions
 
-      if (canJump) {
-        playSFX("jump")
-        const jumpVector = new Vector2(0, playerJumpAmount)
-        player.setVelocity(player.getV().add(jumpVector))
+    if (!player.dead) {
+      if (player.getInputDevice().getJumpButtonIsDown()) {
+        const [, H] = getWH()
+        const [, h] = player.getDimensions()
+        const distFromBottom = H - h / 2 - player.getP()[1]
+        const canJump =
+          distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
+
+        if (canJump) {
+          playSFX("jump")
+          const jumpVector = new Vector2(0, playerJumpAmount)
+          player.setVelocity(player.getV().add(jumpVector))
+        }
       }
-    }
 
-    if (
-      player.getInputDevice().getPrimaryActionButtonIsDown()
-      //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-    ) {
-      const thing = player.getPrimaryActionEquipable().use(player, timeStamp)
-      if (thing) {
-        displaceables.add(thing)
+      if (
+        player.getInputDevice().getPrimaryActionButtonIsDown()
+        //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+      ) {
+        const thing = player.getPrimaryActionEquipable().use(player, timeStamp)
+        if (thing) {
+          displaceables.add(thing)
+        }
       }
-    }
 
-    if (
-      player.getInputDevice().getSecondaryActionButtonIsDown() &&
-      (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-    ) {
-      if (player.getSecondaryActionEquipable().canUse(timeStamp)) {
-        player.getInputDevice().hapticFeedback()
-        const thing = player
-          .getSecondaryActionEquipable()
-          .use(player, timeStamp)
-        displaceables.add(thing)
+      if (
+        player.getInputDevice().getSecondaryActionButtonIsDown() &&
+        (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+      ) {
+        if (player.getSecondaryActionEquipable().canUse(timeStamp)) {
+          player.getInputDevice().hapticFeedback()
+          const thing = player
+            .getSecondaryActionEquipable()
+            .use(player, timeStamp)
+          displaceables.add(thing)
+        }
       }
     }
   }
