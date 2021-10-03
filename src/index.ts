@@ -85,11 +85,13 @@ document.addEventListener("visibilitychange", () => {
 })
 
 function gameLoop(timeStamp: number) {
-  debugContainer.textContent = `fps ${calcFPS(
-    lastFrameTime,
-    timeStamp
-  ).toFixed()}`
-  if (DEBUG) debugContainer.textContent += `(${Math.round(timeStamp)})`
+  if (DEBUG) {
+    debugContainer.textContent = `fps ${calcFPS(
+      lastFrameTime,
+      timeStamp
+    ).toFixed()}`
+    debugContainer.textContent += `(${Math.round(timeStamp)})`
+  }
 
   const flooredTimeStamp = Math.round(timeStamp / 15)
 
