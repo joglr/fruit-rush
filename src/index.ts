@@ -47,7 +47,7 @@ const initialState: GameState = {
 
 const gameState = new State<GameState>(initialState)
 
-const unsubscribe = gameState.subscribe((s) => {
+gameState.subscribe((s) => {
   console.log(s.status)
   switch (s.status) {
     case GameStatus.RUNNING: {
