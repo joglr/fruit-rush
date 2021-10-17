@@ -21,7 +21,7 @@
     "url": "https://github.com/joglr/monkey/issues"
   },
   "husky": {
-    "pre-commit": "yarn test"
+    "pre-commit": "yarn test && tsc"
   },
   "homepage": "https://github.com/joglr/monkey#readme",
   "dependencies": {
