@@ -1,5 +1,5 @@
 {
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "cSpell.enabled": false,
   "cSpell.words": [
     "arrowdown",
