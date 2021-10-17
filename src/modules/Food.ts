@@ -35,7 +35,7 @@ const multiplier = 4
 const defaultEffect = (p: Player) => {
   playSFX("eat")
   p.icon = PlayerState.EAT
-  p.resetIconTimeout = setTimeout(() => {
+  p.resetIconTimeout = window.setTimeout(() => {
     p.icon = PlayerState.DEFAULT
   }, 500)
   p.addToScore(1)
@@ -45,7 +45,7 @@ const tacoEffect = (p: Player) => {
   playSFX("eat_bad")
   p.damage(tacoDamage, () => {
     p.hasDiarrhea = true
-    setTimeout(() => {
+    window.setTimeout(() => {
       p.hasDiarrhea = false;
     }, tacoEffectDuration)
   })

@@ -37,8 +37,8 @@ export class Player extends Icon {
   playerNumber: number
   isStunned = false
   hasDiarrhea = false
-  stunTimeout = -1
-  resetIconTimeout = -1
+  stunTimeout: number | null  = null
+  resetIconTimeout: number | null  = null
   dead = false
   justDied = false
 
@@ -106,7 +106,7 @@ export class Player extends Icon {
 
     playSFX("eat")
     this.icon = PlayerState.EAT
-    this.resetIconTimeout = setTimeout(() => {
+    this.resetIconTimeout = window.setTimeout(() => {
       this.icon = PlayerState.DEFAULT
     }, 500)
     this.addToScore(value)
@@ -150,7 +150,7 @@ export class Player extends Icon {
       this.isStunned = true
       this.icon = PlayerState.STUNNED
 
-      this.stunTimeout = setTimeout(() => {
+      this.stunTimeout = window.setTimeout(() => {
         this.isStunned = false
         this.icon = PlayerState.DEFAULT
       }, playerStunDuration)
@@ -178,8 +178,8 @@ export class Player extends Icon {
     this.getInputDevice().hapticFeedback();
     const newHealth = Math.max(this.health - amount, 0)
     if (newHealth <= 0) {
-      clearTimeout(this.stunTimeout)
-      clearTimeout(this.resetIconTimeout)
+      if (this.stunTimeout) window.clearTimeout(this.stunTimeout)
+      if (this.resetIconTimeout) window.clearTimeout(this.resetIconTimeout)
       this.dead = true
       this.justDied = true
       this.health = 0
