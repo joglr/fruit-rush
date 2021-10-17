@@ -20,9 +20,6 @@
   "bugs": {
     "url": "https://github.com/joglr/monkey/issues"
   },
-  "husky": {
-    "pre-commit": "yarn test && tsc"
-  },
   "homepage": "https://github.com/joglr/monkey#readme",
   "dependencies": {
     "@babel/preset-env": "^7.15.6",
