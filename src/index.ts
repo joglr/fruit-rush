@@ -215,7 +215,7 @@ function gameLoop(timeStamp: number) {
     //  else {
     //   scoreContainer.textContent = `${p
     //     .getScore()
-    //     .toString()}💩 ${p.getHealth()}❤`
+    //     .toString()}💩 ${p.getLives()}❤`
     // }
 
     const mv = p.getInputDevice().getMovementVector()
@@ -241,7 +241,7 @@ function gameLoop(timeStamp: number) {
   s: ${p.isStunned}
   d: ${p.hasDiarrhea}
   isOnFire: ${p.getIsOnFire()}
-  health: ${p.getHealth()}
+  health: ${p.getLives()}
   </div>`
   }
 

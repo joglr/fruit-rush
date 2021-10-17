@@ -4,7 +4,7 @@ import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
 import { Icon } from "./Icon"
 import { Axis } from "./Math"
 import {
-  playerInitialHealth,
+  playerInitialLives,
   playerCoolDownIndicatorOffset,
   playerMaxHorizontalVelocity,
   playerMinHorizontalVelocity,
@@ -80,7 +80,7 @@ export class Player extends Icon {
       ctx.font = `bold ${h / 2}px sans-serif`
       ctx.fillStyle = this.getColor()
       ctx.fillText(
-        `${this.getScore().toString()}🍌 ${this.getHealth()}💗`,
+        `${this.getScore().toString()}🍌 ${this.getLives()}💗`,
         x,
         y - this.getDimensions()[1]
       )
@@ -91,7 +91,7 @@ export class Player extends Icon {
   private inputDevice: InputDevice
   private hue = genHue()
 
-  private health: number = playerInitialHealth
+  private lives: number = playerInitialLives
   private isOnFire: boolean = false
   private primaryActionEquipable = new PoopGun(poopGunCoolDown)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
@@ -166,26 +166,26 @@ export class Player extends Icon {
     return this.isOnFire
   }
 
-  getHealth() {
-    return this.health
+  getLives() {
+    return this.lives
   }
 
   heal(amount: number) {
-    this.health = Math.min(this.health + amount, playerInitialHealth)
+    this.lives = Math.min(this.lives + amount, playerInitialLives)
   }
 
   damage(amount: number, callback: () => void) {
     this.getInputDevice().hapticFeedback();
-    const newHealth = Math.max(this.health - amount, 0)
-    if (newHealth <= 0) {
+    const newLives = Math.max(this.lives - amount, 0)
+    if (newLives <= 0) {
       if (this.stunTimeout) window.clearTimeout(this.stunTimeout)
       if (this.resetIconTimeout) window.clearTimeout(this.resetIconTimeout)
       this.dead = true
       this.justDied = true
-      this.health = 0
+      this.lives = 0
       this.icon = PlayerState.DEAD
     } else {
-      this.health = newHealth
+      this.lives = newLives
       callback()
     }
   }
