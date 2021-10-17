@@ -151,7 +151,7 @@ function gameLoop(timeStamp: number) {
             const timeLeft = animationEnd - Date.now()
 
             if (timeLeft <= 0) {
-              return clearInterval(interval)
+              clearInterval(interval)
             }
 
             const particleCount = 50 * (timeLeft / duration)
