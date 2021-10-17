@@ -9,7 +9,7 @@ export abstract class Displaceable extends Box {
   constructor(
     p: [number, number],
     v: [number, number] = [0, 0],
-    a: [number, number] = [0, gravityAmount],
+    a: [number, number] = [0, gravityAmount]
   ) {
     super(p)
     this.v = Vector2.fromArray(v)
@@ -29,7 +29,6 @@ export abstract class Displaceable extends Box {
     return "red"
   }
 
-
   getV() {
     return this.v
   }
@@ -47,13 +46,13 @@ export abstract class Displaceable extends Box {
     return this.a.toArray()
   }
 
-  update() {
+  update(_deltaT: number) {
     this.p = this.p.add(this.v)
     let newV = this.v.add(this.a)
 
     const magV = newV.getMagnitude()
     if (magV > 10) {
-      const InvSquareV = (1 / Math.pow(magV, 2)) * 0.1;
+      const InvSquareV = (1 / Math.pow(magV, 2)) * 0.1
       const factor = 1 - InvSquareV
       // if (factor < 0) debugger
       newV = newV.multiply(factor)

@@ -26,7 +26,7 @@ export enum PlayerState {
   DEFAULT = "🐵",
   STUNNED = "🙈",
   EAT = "🙊",
-  DEAD = "💀"
+  DEAD = "💀",
 }
 
 // const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
@@ -37,8 +37,8 @@ export class Player extends Icon {
   playerNumber: number
   isStunned = false
   hasDiarrhea = false
-  stunTimeout: number | null  = null
-  resetIconTimeout: number | null  = null
+  stunTimeout: number | null = null
+  resetIconTimeout: number | null = null
   dead = false
   justDied = false
 
@@ -61,8 +61,10 @@ export class Player extends Icon {
       // ctx.arc(...center, radius, rotation + start, rotation)
       // ctx.lineTo(...center)
       // ctx.fill()
-      const [x,y] = this.getP().subtract(this.getDimensions().divide(2)).toArray()
-      const [w,h] = this.dimensions
+      const [x, y] = this.getP()
+        .subtract(this.getDimensions().divide(2))
+        .toArray()
+      const [w, h] = this.dimensions
       ctx.fillStyle = "#fff"
       ctx.fillRect(
         x,
@@ -76,7 +78,7 @@ export class Player extends Icon {
 
     const [x, y] = this.getPosition()
     if (!this.dead) {
-      const [,h] = this.dimensions
+      const [, h] = this.dimensions
       ctx.font = `bold ${h / 2}px sans-serif`
       ctx.fillStyle = this.getColor()
       ctx.fillText(
@@ -96,14 +98,17 @@ export class Player extends Icon {
   private primaryActionEquipable = new PoopGun(poopGunCoolDown)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
-  constructor(playerNumber: number, inputDevice: InputDevice, position: [number, number]) {
+  constructor(
+    playerNumber: number,
+    inputDevice: InputDevice,
+    position: [number, number]
+  ) {
     super(position)
     this.playerNumber = playerNumber
     this.inputDevice = inputDevice
   }
 
   eat(value: number) {
-
     playSFX("eat")
     this.icon = PlayerState.EAT
     this.resetIconTimeout = window.setTimeout(() => {
@@ -155,7 +160,6 @@ export class Player extends Icon {
         this.icon = PlayerState.DEFAULT
       }, playerStunDuration)
     })
-
   }
 
   extinguish() {
@@ -175,7 +179,7 @@ export class Player extends Icon {
   }
 
   damage(amount: number, callback: () => void) {
-    this.getInputDevice().hapticFeedback();
+    this.getInputDevice().hapticFeedback()
     const newLives = Math.max(this.lives - amount, 0)
     if (newLives <= 0) {
       if (this.stunTimeout) window.clearTimeout(this.stunTimeout)
@@ -190,7 +194,7 @@ export class Player extends Icon {
     }
   }
 
-  update() {
+  update(deltaT: number) {
     if (this.isStunned) return
     const velocityChange = this.getInputDevice()
       .getMovementVector()
@@ -198,7 +202,7 @@ export class Player extends Icon {
       .constrainToAxis(Axis.X)
 
     if (!this.dead) this.v = this.v.add(velocityChange)
-    super.update()
+    super.update(deltaT)
 
     this.v = this.v.limitAxis(
       playerMinHorizontalVelocity,

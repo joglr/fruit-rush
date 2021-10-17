@@ -48,7 +48,6 @@ const initialState: GameState = {
 const gameState = new State<GameState>(initialState)
 
 gameState.subscribe((s) => {
-  console.log(s.status)
   switch (s.status) {
     case GameStatus.RUNNING: {
       introContainer.style.display = "none"
@@ -120,12 +119,13 @@ document.addEventListener("visibilitychange", () => {
 })
 
 function gameLoop(timeStamp: number) {
+  const deltaT = timeStamp - lastFrameTime
   if (DEBUG) {
     debugContainer.textContent = `fps ${calcFPS(
       lastFrameTime,
       timeStamp
     ).toFixed()}`
-    debugContainer.textContent += `(${Math.round(timeStamp)})`
+    debugContainer.textContent += ` (Δt = ${deltaT.toFixed(3)})`
   }
 
   const flooredTimeStamp = Math.round(timeStamp / 15)
@@ -248,7 +248,7 @@ function gameLoop(timeStamp: number) {
   if (DEBUG)
     debugContainer.innerHTML += `
 Entities: ${displaceables.size}`
-  updateGameState(timeStamp)
+  updateGameState(timeStamp, deltaT)
   drawFrame(timeStamp)
   lastAnimationFrameID = requestAnimationFrame(gameLoop)
   lastFrameTime = timeStamp
@@ -274,7 +274,7 @@ function drawFrame(timeStamp: number) {
 
 let lastSecond = 0
 
-function updateGameState(timeStamp: number) {
+function updateGameState(timeStamp: number, deltaT: number) {
   let isSecond = false
 
   if (timeStamp - lastSecond > 1000) {
@@ -346,7 +346,7 @@ function updateGameState(timeStamp: number) {
   const H = window.innerHeight
 
   for (const d of displaceables) {
-    d.update()
+    d.update(deltaT)
     let [x, y] = d.getPosition()
     const [w, h] = d.getDimensions()
 
