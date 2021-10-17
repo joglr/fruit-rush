@@ -25,6 +25,13 @@ body {
   overflow: hidden;
 }
 
+#intro {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  inset: 0;
+}
+
 #debug {
   position: absolute;
   top: 0;

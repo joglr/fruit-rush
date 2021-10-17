@@ -1,4 +1,9 @@
-import { fruitMargin, gravityAmount, pausedText, playerJumpAmount } from "./config"
+import {
+  fruitMargin,
+  gravityAmount,
+  pausedText,
+  playerJumpAmount,
+} from "./config"
 import { playSFX } from "./modules/sound"
 import { Displaceable } from "./modules/Displaceable"
 import { Fire } from "./modules/Equipables/NotAFlameThrower"
@@ -15,16 +20,46 @@ import init, {
 import { randBetween, Vector2 } from "./modules/Math"
 import { Player } from "./modules/Player"
 import "./style.css"
+import { State } from "./modules/State"
 
 // const gameContainer = document.querySelector("#game")!;
 const debugContainer = document.querySelector("#debug")!
 const scoreboardContainer = document.querySelector("#scoreboard")!
+const introContainer = document.querySelector("#intro")! as HTMLDivElement
 const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!
 
-let gameOver = false
-
 const DEBUG = window.location.hash.includes("debug")
+
+interface GameState {
+  status: GameStatus
+}
+
+enum GameStatus {
+  IDLE,
+  RUNNING,
+  GAME_OVER,
+}
+
+const initialState: GameState = {
+  status: GameStatus.IDLE,
+}
+
+const gameState = new State<GameState>(initialState)
+
+const unsubscribe = gameState.subscribe((s) => {
+  console.log(s.status)
+  switch (s.status) {
+    case GameStatus.RUNNING: {
+      introContainer.style.display = "none"
+      break
+    }
+    case GameStatus.IDLE: {
+      introContainer.style.display = "initial"
+      break
+    }
+  }
+})
 
 function resizeHandler() {
   canvas.width = window.innerWidth
@@ -113,11 +148,9 @@ function gameLoop(timeStamp: number) {
     //   positionables.add(water);
     //   gameContainer?.appendChild(water.getDOMElement());
 
-    if (!gameOver) {
-
-
+    if (gameState.getState().status === GameStatus.RUNNING) {
       const x = randBetween(fruitMargin, W - fruitMargin)
-      const food = new Food([x, - fruitMargin], [0, 0], [0, gravityAmount / 10])
+      const food = new Food([x, -fruitMargin], [0, 0], [0, gravityAmount / 10])
       displaceables.add(food)
     }
   }
@@ -132,41 +165,50 @@ function gameLoop(timeStamp: number) {
       scoreContainer.textContent = "DEAD"
       if (p.justDied) {
         p.justDied = false
-        if (playersAlive === 1) {
-          gameOver = true
-          const duration = 15 * 1000
-          const animationEnd = Date.now() + duration
-          const defaults = {
-            startVelocity: 30,
-            spread: 360,
-            ticks: 60,
-            zIndex: 0,
-          }
 
-          function randomInRange(min: number, max: number) {
-            return Math.random() * (max - min) + min
-          }
-
-          const interval = setInterval(function () {
-            const timeLeft = animationEnd - Date.now()
-
-            if (timeLeft <= 0) {
-              clearInterval(interval)
+        if (playersAlive < 2) {
+          gameState.setState((p) => ({
+            ...p,
+            status: GameStatus.GAME_OVER,
+          }))
+          gameState.setState(() => ({
+            status: GameStatus.GAME_OVER,
+          }))
+          if (playersAlive === 1) {
+            const duration = 15 * 1000
+            const animationEnd = Date.now() + duration
+            const defaults = {
+              startVelocity: 30,
+              spread: 360,
+              ticks: 60,
+              zIndex: 0,
             }
 
-            const particleCount = 50 * (timeLeft / duration)
-            // since particles fall down, start a bit higher than random
-            confetti({
-              ...defaults,
-              particleCount,
-              origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-            })
-            confetti({
-              ...defaults,
-              particleCount,
-              origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-            })
-          }, 250)
+            function randomInRange(min: number, max: number) {
+              return Math.random() * (max - min) + min
+            }
+
+            const interval = window.setInterval(function () {
+              const timeLeft = animationEnd - Date.now()
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval)
+              }
+
+              const particleCount = 50 * (timeLeft / duration)
+              // since particles fall down, start a bit higher than random
+              confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+              })
+              confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+              })
+            }, 250)
+          }
         }
       }
     }
@@ -390,9 +432,7 @@ function updateGameState(timeStamp: number) {
       // Food -> 🐵
       if (d instanceof Food && od instanceof Player) {
         // Affect player by the consumed food
-        if (
-          d.intersectsWith(od)
-        ) {
+        if (d.intersectsWith(od)) {
           d.affect(od)
           displaceables.delete(d)
           break
@@ -410,6 +450,8 @@ init()
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function createPlayer(inputDevice: InputDevice) {
+  if (gameState.getState().status !== GameStatus.RUNNING)
+    gameState.setState((p) => ({ ...p, status: GameStatus.RUNNING }))
   const player = new Player(
     players.size,
     inputDevice,
