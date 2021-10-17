@@ -1,4 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm test
+git stash -k -u
+(yarn test && yarn build)
+retVal=$?
+git stash pop
+exit $retVal
+
+
