@@ -1,6 +1,6 @@
 import { Vector2 } from "./Math"
 import { Box } from "./Box"
-import { gravityAmount } from "../config"
+import { FRAMERATE_MIGRATION_DURATION, gravityAmount } from "../config"
 
 export abstract class Displaceable extends Box {
   protected v: Vector2
@@ -46,10 +46,13 @@ export abstract class Displaceable extends Box {
     return this.a.toArray()
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(_deltaT: number) {
-    this.p = this.p.add(this.v)
-    let newV = this.v.add(this.a)
+  update(deltaT: number) {
+    this.p = this.p.add(
+      this.v.divide(FRAMERATE_MIGRATION_DURATION).multiply(deltaT)
+    )
+    let newV = this.v.add(
+      this.a.divide(FRAMERATE_MIGRATION_DURATION).multiply(deltaT)
+    )
 
     const magV = newV.getMagnitude()
     if (magV > 10) {
