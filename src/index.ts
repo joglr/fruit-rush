@@ -126,6 +126,14 @@ document.addEventListener("visibilitychange", () => {
 
 function gameLoop(timeStamp: number) {
   const deltaT = timeStamp - lastFrameTime
+  updateGameState(timeStamp, deltaT)
+  drawUI(timeStamp, deltaT)
+  drawFrame(timeStamp)
+  lastAnimationFrameID = requestAnimationFrame(gameLoop)
+  lastFrameTime = timeStamp
+}
+
+function drawUI(timeStamp: number, deltaT: number) {
   if (DEBUG) {
     debugContainer.textContent = `fps ${calcFPS(
       lastFrameTime,
@@ -172,10 +180,6 @@ function gameLoop(timeStamp: number) {
   if (DEBUG)
     debugContainer.innerHTML += `
 Entities: ${displaceables.size}`
-  updateGameState(timeStamp, deltaT)
-  drawFrame(timeStamp)
-  lastAnimationFrameID = requestAnimationFrame(gameLoop)
-  lastFrameTime = timeStamp
 }
 
 function calcFPS(lastFrameTime: number, timestamp: number) {
