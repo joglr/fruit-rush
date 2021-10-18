@@ -46,9 +46,6 @@
       "eslint --cache --fix",
       "tsc-files --noEmit"
     ],
-    "**/*.{js,css,md}": [
-      "prettier --write"
-    ],
-    "*.{js,css,md}": "prettier --write"
+    "**/*.{ts,js,css,md}": "prettier --write"
   }
 }

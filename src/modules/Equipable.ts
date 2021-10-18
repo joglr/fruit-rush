@@ -20,5 +20,5 @@ export abstract class Equipable {
   canUse(currentTime: number): boolean {
     return currentTime > this.lastUsed + this.repeatRate
   }
-  abstract use(player: Player, currentTime: number): unknown
+  abstract use(player: Player, currentTime: number, deltaT: number): unknown
 }
