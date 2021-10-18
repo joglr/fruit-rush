@@ -25,3 +25,5 @@ export const tacoDamage = 1
 export const tacoEffectDuration = 2000
 
 export const FRAMERATE_MIGRATION_DURATION = 1000 / 60
+export const fruitSpawnIntervalMilliseconds = 1000
+export const maxDisplaceables = 400

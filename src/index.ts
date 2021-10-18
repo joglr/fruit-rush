@@ -1,7 +1,9 @@
 import {
   FRAMERATE_MIGRATION_DURATION,
   fruitMargin,
+  fruitSpawnIntervalMilliseconds,
   gravityAmount,
+  maxDisplaceables,
   pausedText,
   playerJumpAmount,
 } from "./config"
@@ -132,91 +134,13 @@ function gameLoop(timeStamp: number) {
     debugContainer.textContent += ` (Δt = ${deltaT.toFixed(3)})`
   }
 
-  const flooredTimeStamp = Math.round(timeStamp / 15)
-
-  // Interval events
-  if (
-    flooredTimeStamp % 50 === 0 &&
-    displaceables.size < 400 &&
-    players.size > 0
-  ) {
-    const [W] = getWH()
-
-    //   let [x, y] = generateRandomPos(W, H).getComponents();
-    //   const fire = new Fire([x, y]);
-    //   positionables.add(fire);
-    //   gameContainer?.appendChild(fire.getDOMElement());
-
-    //   [x, y] = generateRandomPos(W, H).getComponents();
-    //   const water = new Water([x, y], [0,0]);
-    //   positionables.add(water);
-    //   gameContainer?.appendChild(water.getDOMElement());
-
-    if (gameState.getState().status === GameStatus.RUNNING) {
-      const x = randBetween(fruitMargin, W - fruitMargin)
-      const food = new Food([x, -fruitMargin], [0, 0], [0, gravityAmount / 10])
-      displaceables.add(food)
-    }
-  }
-
-  const playersAlive = Array.from(players).filter((p) => !p.dead).length
-
   for (const p of players) {
     const scoreContainer =
       scoreboardContainer.children[Array.from(players).indexOf(p)]
 
     if (p.dead) {
       scoreContainer.textContent = "DEAD"
-      if (p.justDied) {
-        p.justDied = false
-
-        if (playersAlive < 2) {
-          gameState.setState((p) => ({
-            ...p,
-            status: GameStatus.GAME_OVER,
-          }))
-          gameState.setState(() => ({
-            status: GameStatus.GAME_OVER,
-          }))
-          if (playersAlive === 1) {
-            const duration = 15 * 1000
-            const animationEnd = Date.now() + duration
-            const defaults = {
-              startVelocity: 30,
-              spread: 360,
-              ticks: 60,
-              zIndex: 0,
-            }
-
-            const interval = window.setInterval(function () {
-              const timeLeft = animationEnd - Date.now()
-
-              if (timeLeft <= 0) {
-                return clearInterval(interval)
-              }
-
-              const particleCount = 50 * (timeLeft / duration)
-              // since particles fall down, start a bit higher than random
-              confetti({
-                ...defaults,
-                particleCount,
-                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-              })
-              confetti({
-                ...defaults,
-                particleCount,
-                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-              })
-            }, 250)
-          }
-        }
-      }
     }
-    //  else {
-    //   scoreContainer.textContent = `${p
-    //     .getScore()
-    //     .toString()}💩 ${p.getLives()}❤`
-    // }
 
     const mv = p.getInputDevice().getMovementVector()
 
@@ -273,78 +197,154 @@ function drawFrame(timeStamp: number) {
 // Game state
 
 let lastSecond = 0
+let lastFruitSpawn = 0
 
 function updateGameState(timeStamp: number, deltaT: number) {
-  let isSecond = false
+  if (gameState.getState().status === GameStatus.RUNNING) {
+    if (
+      timeStamp - lastFruitSpawn > fruitSpawnIntervalMilliseconds &&
+      displaceables.size < maxDisplaceables &&
+      players.size > 0
+    ) {
+      lastFruitSpawn = timeStamp
+      const [W] = getWH()
 
-  if (timeStamp - lastSecond > 1000) {
-    // A second has passed
+      //   let [x, y] = generateRandomPos(W, H).getComponents();
+      //   const fire = new Fire([x, y]);
+      //   positionables.add(fire);
+      //   gameContainer?.appendChild(fire.getDOMElement());
 
-    isSecond = true
-    lastSecond = timeStamp
-  }
+      //   [x, y] = generateRandomPos(W, H).getComponents();
+      //   const water = new Water([x, y], [0,0]);
+      //   positionables.add(water);
+      //   gameContainer?.appendChild(water.getDOMElement());
 
-  for (const player of players) {
-    const positiveAimVector: [number, number] = player
-      .getInputDevice()
-      .getAimVector()
-      .toPositiveVector()
-      .toArray()
-
-    // Events that occur every second:
-
-    if (isSecond) {
-      // TODO: Refactor modulo based events to us diffing instead
-      // if (player.getIsOnFire()) {
-      //   player.damage(Fire.fireDamage)
-      // }
+      if (gameState.getState().status === GameStatus.RUNNING) {
+        const x = randBetween(fruitMargin, W - fruitMargin)
+        const food = new Food(
+          [x, -fruitMargin],
+          [0, 0],
+          [0, gravityAmount / 10]
+        )
+        displaceables.add(food)
+      }
     }
 
-    // Player actions
+    if (timeStamp - lastSecond > 1000) {
+      // A second has passed
 
-    if (!player.dead) {
-      if (player.getInputDevice().getJumpButtonIsDown()) {
-        const [, H] = getWH()
-        const [, h] = player.getDimensions()
-        const distFromBottom = H - h / 2 - player.getP()[1]
-        const canJump =
-          distFromBottom < 5 && player.getVelocity()[1] === 0 && !player.dead
+      lastSecond = timeStamp
+    }
+    const playersAlive = Array.from(players).filter((p) => !p.dead).length
 
-        if (canJump) {
-          playSFX("jump")
-          const jumpVector = new Vector2(0, playerJumpAmount)
-          player.setVelocity(
-            player
-              .getV()
-              .divide(FRAMERATE_MIGRATION_DURATION)
-              .multiply(deltaT)
-              .add(jumpVector)
-          )
+    for (const p of players) {
+      if (p.dead) {
+        if (p.justDied) {
+          p.justDied = false
+
+          if (playersAlive < 2) {
+            gameState.setState((p) => ({
+              ...p,
+              status: GameStatus.GAME_OVER,
+            }))
+            gameState.setState(() => ({
+              status: GameStatus.GAME_OVER,
+            }))
+
+            if (playersAlive === 1) {
+              const duration = 15 * 1000
+              const animationEnd = Date.now() + duration
+              const defaults = {
+                startVelocity: 30,
+                spread: 360,
+                ticks: 60,
+                zIndex: 0,
+              }
+
+              const interval = window.setInterval(function () {
+                const timeLeft = animationEnd - Date.now()
+
+                if (timeLeft <= 0) {
+                  return clearInterval(interval)
+                }
+
+                const particleCount = 50 * (timeLeft / duration)
+                // since particles fall down, start a bit higher than random
+                confetti({
+                  ...defaults,
+                  particleCount,
+                  origin: {
+                    x: randomInRange(0.1, 0.3),
+                    y: Math.random() - 0.2,
+                  },
+                })
+                confetti({
+                  ...defaults,
+                  particleCount,
+                  origin: {
+                    x: randomInRange(0.7, 0.9),
+                    y: Math.random() - 0.2,
+                  },
+                })
+              }, 250)
+            }
+          }
         }
       }
+      //  else {
+      //   scoreContainer.textContent = `${p
+      //     .getScore()
+      //     .toString()}💩 ${p.getLives()}❤`
+      // }
 
-      if (
-        player.getInputDevice().getPrimaryActionButtonIsDown()
-        //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-      ) {
-        const thing = player
-          .getPrimaryActionEquipable()
-          .use(player, timeStamp, deltaT)
-        if (thing) {
-          displaceables.add(thing)
+      const positiveAimVector: [number, number] = p
+        .getInputDevice()
+        .getAimVector()
+        .toPositiveVector()
+        .toArray()
+
+      // Player actions
+
+      if (!p.dead) {
+        if (p.getInputDevice().getJumpButtonIsDown()) {
+          const [, H] = getWH()
+          const [, h] = p.getDimensions()
+          const distFromBottom = H - h / 2 - p.getP()[1]
+          const canJump =
+            distFromBottom < 5 && p.getVelocity()[1] === 0 && !p.dead
+
+          if (canJump) {
+            playSFX("jump")
+            const jumpVector = new Vector2(0, playerJumpAmount)
+            p.setVelocity(
+              p
+                .getV()
+                .divide(FRAMERATE_MIGRATION_DURATION)
+                .multiply(deltaT)
+                .add(jumpVector)
+            )
+          }
         }
-      }
 
-      if (
-        player.getInputDevice().getSecondaryActionButtonIsDown() &&
-        (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-      ) {
-        if (player.getSecondaryActionEquipable().canUse(timeStamp)) {
-          player.getInputDevice().hapticFeedback()
-          const thing = player
-            .getSecondaryActionEquipable()
-            .use(player, timeStamp)
-          displaceables.add(thing)
+        if (
+          p.getInputDevice().getPrimaryActionButtonIsDown()
+          //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+        ) {
+          const thing = p.getPrimaryActionEquipable().use(p, timeStamp, deltaT)
+          if (thing) {
+            displaceables.add(thing)
+          }
+        }
+
+        if (
+          p.getInputDevice().getSecondaryActionButtonIsDown() &&
+          (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+        ) {
+          if (p.getSecondaryActionEquipable().canUse(timeStamp)) {
+            p.getInputDevice().hapticFeedback()
+            const thing = p.getSecondaryActionEquipable().use(p, timeStamp)
+            displaceables.add(thing)
+          }
         }
       }
     }
