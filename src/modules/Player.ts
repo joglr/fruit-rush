@@ -42,7 +42,7 @@ export class Player extends Icon {
   dead = false
   justDied = false
 
-  static createFilter(hue: number, sepia: number = 150): string {
+  static createFilter(hue: number, sepia = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
   }
 
@@ -94,7 +94,7 @@ export class Player extends Icon {
   private hue = genHue()
 
   private lives: number = playerInitialLives
-  private isOnFire: boolean = false
+  private isOnFire = false
   private primaryActionEquipable = new PoopGun(poopGunCoolDown)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 

@@ -46,6 +46,7 @@ export abstract class Displaceable extends Box {
     return this.a.toArray()
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(_deltaT: number) {
     this.p = this.p.add(this.v)
     let newV = this.v.add(this.a)
@@ -74,10 +75,10 @@ export abstract class Displaceable extends Box {
     const [aw, ah] = this.getDimensions().toArray()
     const [bw, bh] = b.getDimensions().toArray()
 
-    let [minAx, minAy] = this.p.toArray()
-    let [minBx, minBy] = b.getP().toArray()
-    let [maxAx, maxAy] = [minAx + aw, minAy + ah]
-    let [maxBx, maxBy] = [minBx + bw, minBy + bh]
+    const [minAx, minAy] = this.p.toArray()
+    const [minBx, minBy] = b.getP().toArray()
+    const [maxAx, maxAy] = [minAx + aw, minAy + ah]
+    const [maxBx, maxBy] = [minBx + bw, minBy + bh]
 
     // // Intersection of two rectangles
 

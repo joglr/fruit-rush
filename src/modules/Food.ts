@@ -25,12 +25,11 @@ type FOOD =
 
 interface FoodProperties {
   size: [number, number]
-  effect: Function
+  effect: (p: Player) => void
   points: number
 }
 
 const multiplier = 4
-
 
 const defaultEffect = (p: Player) => {
   playSFX("eat")
@@ -46,7 +45,7 @@ const tacoEffect = (p: Player) => {
   p.damage(tacoDamage, () => {
     p.hasDiarrhea = true
     window.setTimeout(() => {
-      p.hasDiarrhea = false;
+      p.hasDiarrhea = false
     }, tacoEffectDuration)
   })
   // TODO: Taco sound
@@ -54,7 +53,10 @@ const tacoEffect = (p: Player) => {
   // TODO: Dihrearea effect
 }
 
-const foodMap: Map<FOOD, FoodProperties> = new Map<FOOD, FoodProperties>([
+const foodMap: ReadonlyMap<FOOD, FoodProperties> = new Map<
+  FOOD,
+  FoodProperties
+>([
   ["🍌", { size: [13, 13], points: 1, effect: defaultEffect }],
   ["🍎", { size: [10, 10], points: 1, effect: defaultEffect }],
   ["🍏", { size: [10, 10], points: 1, effect: defaultEffect }],
@@ -77,6 +79,10 @@ const foodMap: Map<FOOD, FoodProperties> = new Map<FOOD, FoodProperties>([
 export class Food extends Icon {
   icon = pick<FOOD>(Array.from(foodMap.keys()))
   private properties = foodMap.get(this.icon)
-  dimensions = Vector2.fromArray(this.properties!.size.map(x => x * multiplier))
+  dimensions = Vector2.fromArray(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.properties!.size.map((x) => x * multiplier)
+  )
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   affect = this.properties!.effect
 }

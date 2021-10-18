@@ -2,6 +2,10 @@ export function randBetween(from: number, to: number) {
   return from + Math.floor(Math.random() * (to - from))
 }
 
+export function randomInRange(min: number, max: number) {
+  return Math.random() * (max - min) + min
+}
+
 type AxisIndex = 0 | 1
 
 export enum Axis {
