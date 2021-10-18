@@ -1,4 +1,5 @@
 import {
+  FRAMERATE_MIGRATION_DURATION,
   fruitMargin,
   gravityAmount,
   pausedText,
@@ -312,7 +313,13 @@ function updateGameState(timeStamp: number, deltaT: number) {
         if (canJump) {
           playSFX("jump")
           const jumpVector = new Vector2(0, playerJumpAmount)
-          player.setVelocity(player.getV().add(jumpVector))
+          player.setVelocity(
+            player
+              .getV()
+              .divide(FRAMERATE_MIGRATION_DURATION)
+              .multiply(deltaT)
+              .add(jumpVector)
+          )
         }
       }
 
@@ -320,7 +327,9 @@ function updateGameState(timeStamp: number, deltaT: number) {
         player.getInputDevice().getPrimaryActionButtonIsDown()
         //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
       ) {
-        const thing = player.getPrimaryActionEquipable().use(player, timeStamp)
+        const thing = player
+          .getPrimaryActionEquipable()
+          .use(player, timeStamp, deltaT)
         if (thing) {
           displaceables.add(thing)
         }
