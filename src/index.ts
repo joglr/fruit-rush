@@ -17,16 +17,21 @@ import init, {
   InputDevice,
   KeyboardInput,
 } from "./modules/InputDevice"
-import { randBetween, Vector2 } from "./modules/Math"
+import { randBetween, randomInRange, Vector2 } from "./modules/Math"
 import { Player } from "./modules/Player"
 import "./style.css"
 import { State } from "./modules/State"
 
 // const gameContainer = document.querySelector("#game")!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const debugContainer = document.querySelector("#debug")!
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const scoreboardContainer = document.querySelector("#scoreboard")!
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const introContainer = document.querySelector("#intro")! as HTMLDivElement
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const ctx = canvas.getContext("2d")!
 
 const DEBUG = window.location.hash.includes("debug")
@@ -90,13 +95,11 @@ function keydownHandler() {
 }
 window.addEventListener("keydown", keydownHandler)
 
-// @ts-ignore
 window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
   const inputDevice = new GamepadInput(e.gamepad.index)
   createPlayer(inputDevice)
 })
 
-// @ts-ignore
 window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
   for (const p of players) {
     const gp = p.getInputDevice() as GamepadInput
@@ -184,10 +187,6 @@ function gameLoop(timeStamp: number) {
               zIndex: 0,
             }
 
-            function randomInRange(min: number, max: number) {
-              return Math.random() * (max - min) + min
-            }
-
             const interval = window.setInterval(function () {
               const timeLeft = animationEnd - Date.now()
 
@@ -227,7 +226,7 @@ function gameLoop(timeStamp: number) {
     const pp = p.getP().toArray().map(threeDecimals).toString()
     const pv = p.getV().toArray().map(threeDecimals).toString()
     const pa = p.getA().toArray().map(threeDecimals).toString()
-    //@ts-ignore
+
     if (DEBUG)
       debugContainer.innerHTML +=
         "\n" +
@@ -361,8 +360,8 @@ function updateGameState(timeStamp: number, deltaT: number) {
     const maxX = W - xOffset
     const maxY = H - yOffset
 
-    let xCollision = x < minX || x > maxX
-    let yCollision = y < minY || y > maxY
+    const xCollision = x < minX || x > maxX
+    const yCollision = y < minY || y > maxY
 
     if (xCollision || yCollision) {
       if (d instanceof Player) {

@@ -22,9 +22,8 @@ export class GamepadInput implements InputDevice {
   gamepadIndex: number
   getMovementVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
-    // @ts-ignore
+    if (!gp) throw new Error("TODO: Handle gamepad disconnected")
     const x = gp.axes[0]
-    // @ts-ignore
     const y = gp.axes[1]
     return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
@@ -38,19 +37,24 @@ export class GamepadInput implements InputDevice {
   }
   hapticFeedback(): void {
     const gamepads = navigator?.getGamepads()
+
+    const gp = gamepads[this.gamepadIndex]
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    gamepads[this.gamepadIndex]?.vibrationActuator.playEffect("dual-rumble", {
-      startDelay: 0,
-      duration: 100,
-      weakMagnitude: 1,
-      strongMagnitude: 1,
-    })
+    const va = gp?.vibrationActuator
+    if (va) {
+      va.playEffect("dual-rumble", {
+        startDelay: 0,
+        duration: 100,
+        weakMagnitude: 1,
+        strongMagnitude: 1,
+      })
+    }
   }
   getAimVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
-    // @ts-ignore
+    if (!gp) throw new Error("Gamepad disconnected")
     const x = gp.axes[2]
-    // @ts-ignore
     const y = gp.axes[3]
     return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))
   }
@@ -263,7 +267,7 @@ export class KeyboardInput implements InputDevice {
   }
 }
 
-export default function init(callback?: Function) {
+export default function init(callback?: () => void) {
   initialized = true
   window.addEventListener("keydown", (evt) => {
     const key = evt.key.toLowerCase() as Key
