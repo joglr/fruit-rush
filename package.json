@@ -1,5 +1,5 @@
 {
-  "name": "monkey",
+  "name": "fruit-rush",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joglr/monkey.git"
+    "url": "git+https://github.com/joglr/fruit-rush.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/joglr/monkey/issues"
+    "url": "https://github.com/joglr/fruit-rush/issues"
   },
-  "homepage": "https://github.com/joglr/monkey#readme",
+  "homepage": "https://github.com/joglr/fruit-rush#readme",
   "dependencies": {
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.6",
