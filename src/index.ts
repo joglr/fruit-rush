@@ -9,7 +9,6 @@ import {
 } from "./config"
 import { playSFX } from "./modules/sound"
 import { Displaceable } from "./modules/Displaceable"
-import { Fire } from "./modules/Equipables/NotAFlameThrower"
 import { Poop } from "./modules/Equipables/PoopGun"
 import { Food } from "./modules/Food"
 import confetti from "canvas-confetti"
@@ -23,15 +22,14 @@ import init, {
 import { randBetween, randomInRange, Vector2 } from "./modules/Math"
 import { Player } from "./modules/Player"
 import "./style.css"
-import { State } from "./modules/State"
+import { render } from "htm/preact"
+import { getUI } from "./modules/ui"
+import { gameState, GameStatus } from "./modules/gameState"
 
-// const gameContainer = document.querySelector("#game")!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const uiContainer = document.querySelector("#gameui")! as HTMLDivElement
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const debugContainer = document.querySelector("#debug")!
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const scoreboardContainer = document.querySelector("#scoreboard")!
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const introContainer = document.querySelector("#intro")! as HTMLDivElement
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -39,34 +37,18 @@ const ctx = canvas.getContext("2d")!
 
 const DEBUG = window.location.hash.includes("debug")
 
-interface GameState {
-  status: GameStatus
-}
-
-enum GameStatus {
-  IDLE,
-  RUNNING,
-  GAME_OVER,
-}
-
-const initialState: GameState = {
-  status: GameStatus.IDLE,
-}
-
-const gameState = new State<GameState>(initialState)
-
-gameState.subscribe((s) => {
-  switch (s.status) {
-    case GameStatus.RUNNING: {
-      introContainer.style.display = "none"
-      break
-    }
-    case GameStatus.IDLE: {
-      introContainer.style.display = "initial"
-      break
-    }
-  }
-})
+// gameState.subscribe((s) => {
+//   switch (s.status) {
+//     case GameStatus.RUNNING: {
+//       introContainer.style.display = "none"
+//       break
+//     }
+//     case GameStatus.IDLE: {
+//       introContainer.style.display = "initial"
+//       break
+//     }
+//   }
+// })
 
 function resizeHandler() {
   canvas.width = window.innerWidth
@@ -142,16 +124,10 @@ function drawUI(timeStamp: number, deltaT: number) {
     debugContainer.textContent += ` (Δt = ${deltaT.toFixed(3)})`
   }
 
+  render(getUI(players, gameState.getState().status), uiContainer)
+
   for (const p of players) {
-    const scoreContainer =
-      scoreboardContainer.children[Array.from(players).indexOf(p)]
-
-    if (p.dead) {
-      scoreContainer.textContent = "DEAD"
-    }
-
     const mv = p.getInputDevice().getMovementVector()
-
     const mvs = mv.toArray().toString()
 
     const threeDecimals = (x: number) => x.toFixed(3)
@@ -172,7 +148,6 @@ function drawUI(timeStamp: number, deltaT: number) {
   j: ${p.getInputDevice().getJumpButtonIsDown()}
   s: ${p.isStunned}
   d: ${p.hasDiarrhea}
-  isOnFire: ${p.getIsOnFire()}
   health: ${p.getLives()}
   </div>`
   }
@@ -192,9 +167,9 @@ function drawFrame(timeStamp: number) {
   ctx.fillStyle = "#000"
   ctx.fillRect(0, 0, ...getWH())
 
-  for (const p of displaceables) {
-    if (DEBUG) p.drawWithHitBox(ctx, timeStamp)
-    else p.draw(ctx, timeStamp)
+  for (const d of displaceables) {
+    if (DEBUG) d.drawWithHitBox(ctx, timeStamp)
+    else d.draw(ctx, timeStamp)
   }
 }
 
@@ -212,16 +187,6 @@ function updateGameState(timeStamp: number, deltaT: number) {
     ) {
       lastFruitSpawn = timeStamp
       const [W] = getWH()
-
-      //   let [x, y] = generateRandomPos(W, H).getComponents();
-      //   const fire = new Fire([x, y]);
-      //   positionables.add(fire);
-      //   gameContainer?.appendChild(fire.getDOMElement());
-
-      //   [x, y] = generateRandomPos(W, H).getComponents();
-      //   const water = new Water([x, y], [0,0]);
-      //   positionables.add(water);
-      //   gameContainer?.appendChild(water.getDOMElement());
 
       if (gameState.getState().status === GameStatus.RUNNING) {
         const x = randBetween(fruitMargin, W - fruitMargin)
@@ -242,64 +207,23 @@ function updateGameState(timeStamp: number, deltaT: number) {
     const playersAlive = Array.from(players).filter((p) => !p.dead).length
 
     for (const p of players) {
-      if (p.dead) {
-        if (p.justDied) {
-          p.justDied = false
+      if (p.dead && p.justDied) {
+        p.justDied = false
 
-          if (playersAlive < 2) {
-            gameState.setState((p) => ({
-              ...p,
-              status: GameStatus.GAME_OVER,
-            }))
-            gameState.setState(() => ({
-              status: GameStatus.GAME_OVER,
-            }))
+        if (playersAlive < 2) {
+          gameState.setState((p) => ({
+            ...p,
+            status: GameStatus.GAME_OVER,
+          }))
+          gameState.setState(() => ({
+            status: GameStatus.GAME_OVER,
+          }))
 
-            if (playersAlive === 1) {
-              const duration = 15 * 1000
-              const animationEnd = Date.now() + duration
-              const defaults = {
-                startVelocity: 30,
-                spread: 360,
-                ticks: 60,
-                zIndex: 0,
-              }
-
-              const interval = window.setInterval(function () {
-                const timeLeft = animationEnd - Date.now()
-
-                if (timeLeft <= 0) {
-                  return clearInterval(interval)
-                }
-
-                const particleCount = 50 * (timeLeft / duration)
-                // since particles fall down, start a bit higher than random
-                confetti({
-                  ...defaults,
-                  particleCount,
-                  origin: {
-                    x: randomInRange(0.1, 0.3),
-                    y: Math.random() - 0.2,
-                  },
-                })
-                confetti({
-                  ...defaults,
-                  particleCount,
-                  origin: {
-                    x: randomInRange(0.7, 0.9),
-                    y: Math.random() - 0.2,
-                  },
-                })
-              }, 250)
-            }
+          if (playersAlive === 1) {
+            celebrate()
           }
         }
       }
-      //  else {
-      //   scoreContainer.textContent = `${p
-      //     .getScore()
-      //     .toString()}💩 ${p.getLives()}❤`
-      // }
 
       const positiveAimVector: [number, number] = p
         .getInputDevice()
@@ -352,75 +276,73 @@ function updateGameState(timeStamp: number, deltaT: number) {
         }
       }
     }
-  }
 
-  const W = window.innerWidth
-  const H = window.innerHeight
+    const [W, H] = getWH()
 
-  for (const d of displaceables) {
-    d.update(deltaT)
-    let [x, y] = d.getPosition()
-    const [w, h] = d.getDimensions()
+    for (const d of displaceables) {
+      d.update(deltaT)
+      let [x, y] = d.getPosition()
+      const [w, h] = d.getDimensions()
 
-    // TODO: Handle collisions differently for food, players and projectiles
+      // TODO: Handle collisions differently for food, players and projectiles
 
-    const factor = d instanceof Food || d instanceof Poop ? -1 : 1
-    const xOffset = (factor * w) / 2
-    const yOffset = (factor * h) / 2
+      const factor = d instanceof Food || d instanceof Poop ? -1 : 1
+      const xOffset = (factor * w) / 2
+      const yOffset = (factor * h) / 2
 
-    const minX = xOffset
-    const minY = yOffset
-    const maxX = W - xOffset
-    const maxY = H - yOffset
+      const minX = xOffset
+      const minY = yOffset
+      const maxX = W - xOffset
+      const maxY = H - yOffset
 
-    const xCollision = x < minX || x > maxX
-    const yCollision = y < minY || y > maxY
+      const xCollision = x < minX || x > maxX
+      const yCollision = y < minY || y > maxY
 
-    if (xCollision || yCollision) {
-      if (d instanceof Player) {
-        let [vx, vy] = d.getV()
-        if (xCollision) {
-          vx *= -1
-          if (x < W / 2) x = minX
-          else x = maxX
-        }
-        if (yCollision) {
-          if (y > maxY) {
-            y = maxY
-            vy = 0
-            vx *= 0.7
+      if (xCollision || yCollision) {
+        if (d instanceof Player) {
+          let [vx, vy] = d.getV()
+          if (xCollision) {
+            vx *= -1
+            if (x < W / 2) x = minX
+            else x = maxX
           }
+          if (yCollision) {
+            if (y > maxY) {
+              y = maxY
+              vy = 0
+              vx *= 0.7
+            }
+          }
+          const v = new Vector2(vx, vy)
+          const p = new Vector2(x, y)
+
+          if (!v.is(d.getV())) d.setVelocity(v)
+          if (!p.is(d.getP())) d.setPosition(p)
+        } else {
+          // Delete non-players when colliding with the ground
+          if (d instanceof Food && y < minY) continue
+          // TODO: Recycle Food, but at new positions
+          const delFromPos = displaceables.delete(d)
+          if (!delFromPos)
+            console.log("Unable to remove unreachable displaceable")
         }
-        const v = new Vector2(vx, vy)
-        const p = new Vector2(x, y)
-
-        if (!v.is(d.getV())) d.setVelocity(v)
-        if (!p.is(d.getP())) d.setPosition(p)
-      } else {
-        // Delete non-players when colliding with the ground
-        if (d instanceof Food && y < minY) continue
-        // TODO: Recycle Food, but at new positions
-        const delFromPos = displaceables.delete(d)
-        if (!delFromPos)
-          console.log("Unable to remove unreachable displaceable")
       }
-    }
-    for (const od of displaceables) {
-      if (od instanceof Player && od.dead) {
-        continue
-      }
-      // // 💦 -> 🔥
-      // if (d instanceof Poop && op instanceof Fire) {
-      //   // Extinguish fire with water if they intersect
-      //   if (d.intersectsWith(op)) {
-      //     displaceables.delete(d)
-      //     displaceables.delete(op)
-      //     break
-      //   }
-      // }
+      for (const od of displaceables) {
+        if (od instanceof Player && od.dead) {
+          continue
+        }
+        // // 💦 -> 🔥
+        // if (d instanceof Poop && op instanceof Fire) {
+        //   // Extinguish fire with water if they intersect
+        //   if (d.intersectsWith(op)) {
+        //     displaceables.delete(d)
+        //     displaceables.delete(op)
+        //     break
+        //   }
+        // }
 
-      // 🔥 -> 🐵
-      if (d instanceof Fire && od instanceof Player) {
+        // 🔥 -> 🐵
+        // if (d instanceof Fire && od instanceof Player) {
         // Set player on fire if they intersect fire
         // if (p.intersectsWith(op)) {
         //   op.damage(Fire.impactDamage);
@@ -429,25 +351,26 @@ function updateGameState(timeStamp: number, deltaT: number) {
         //     break;
         //   }
         // }
-      }
+        // }
 
-      // 💩 -> 🐵
-      if (d instanceof Poop && od instanceof Player) {
-        // Stun player if they intersect with poop
-        if (d.intersectsWith(od) && !od.isStunned) {
-          od.stun()
-          displaceables.delete(d)
-          break
+        // 💩 -> 🐵
+        if (d instanceof Poop && od instanceof Player) {
+          // Stun player if they intersect with poop
+          if (d.intersectsWith(od) && !od.isStunned) {
+            od.stun()
+            displaceables.delete(d)
+            break
+          }
         }
-      }
 
-      // Food -> 🐵
-      if (d instanceof Food && od instanceof Player) {
-        // Affect player by the consumed food
-        if (d.intersectsWith(od)) {
-          d.affect(od)
-          displaceables.delete(d)
-          break
+        // Food -> 🐵
+        if (d instanceof Food && od instanceof Player) {
+          // Affect player by the consumed food
+          if (d.intersectsWith(od)) {
+            d.affect(od)
+            displaceables.delete(d)
+            break
+          }
         }
       }
     }
@@ -461,9 +384,45 @@ init()
 // generateMap();
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
+function celebrate() {
+  const duration = 15 * 1000
+  const animationEnd = Date.now() + duration
+  const defaults = {
+    startVelocity: 30,
+    spread: 360,
+    ticks: 60,
+    zIndex: 0,
+  }
+
+  const interval = window.setInterval(function () {
+    const timeLeft = animationEnd - Date.now()
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval)
+    }
+
+    const particleCount = 50 * (timeLeft / duration)
+    // since particles fall down, start a bit higher than random
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: {
+        x: randomInRange(0.1, 0.3),
+        y: Math.random() - 0.2,
+      },
+    })
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: {
+        x: randomInRange(0.7, 0.9),
+        y: Math.random() - 0.2,
+      },
+    })
+  }, 250)
+}
+
 function createPlayer(inputDevice: InputDevice) {
-  if (gameState.getState().status !== GameStatus.RUNNING)
-    gameState.setState((p) => ({ ...p, status: GameStatus.RUNNING }))
   const player = new Player(
     players.size,
     inputDevice,
@@ -471,51 +430,11 @@ function createPlayer(inputDevice: InputDevice) {
   )
 
   players.add(player)
-  const playerScore = document.createElement("div")
-  playerScore.style.color = player.getColor()
-  scoreboardContainer.appendChild(playerScore)
-
   displaceables.add(player)
+
+  if (gameState.getState().status !== GameStatus.RUNNING)
+    gameState.setState({ status: GameStatus.RUNNING })
 }
-
-// function generateMap() {
-//   let fireCount = 50
-//   let waterCount = 10
-//   let treeCount = 200
-//   let eucalyptusCount = 10
-
-//   const [W, H] = getWH()
-
-//   for (let i = 0; i < fireCount; i++) {
-//     const [x, y] = generateRandomPos(W, H).toArray()
-//     const fire = new Fire([x, y])
-//     displaceables.add(fire)
-//   }
-
-//   for (let i = 0; i < waterCount; i++) {
-//     const [x, y] = generateRandomPos(W, H).toArray()
-//     const water = new Poop([x, y], [0, 0])
-//     displaceables.add(water)
-//   }
-
-//   for (let i = 0; i < treeCount; i++) {
-//     const [x, y] = generateRandomPos(W, H).toArray()
-//     const tree = new Tree([x, y])
-//     displaceables.add(tree)
-//   }
-
-//   for (let i = 0; i < eucalyptusCount; i++) {
-//     const [x, y] = generateRandomPos(W, H).toArray()
-//     const food = new Food([x, y])
-//     displaceables.add(food)
-//   }
-// }
-
-// function generateRandomPos(maxX: number, maxY: number) {
-//   const x = randBetween(-maxX, maxX)
-//   const y = randBetween(-maxY, maxY)
-//   return new Vector2(x, y)
-// }
 
 function getWH(): [number, number] {
   return [window.innerWidth, window.innerHeight]

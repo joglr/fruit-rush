@@ -13,6 +13,7 @@ import {
   poopGunCoolDown,
 } from "../config"
 import { playSFX } from "./sound"
+import { GameState, gameState, GameStatus } from "./gameState"
 
 let currentHue = 0
 
@@ -27,20 +28,49 @@ export enum PlayerState {
   STUNNED = "🙈",
   EAT = "🙊",
   DEAD = "💀",
+  DIARRHEA = "🐒",
 }
 
 // const getMonkey = () => pick(["🙈", "🙉", "🙊", "🐵","🐒","🦍"])
 export class Player extends Icon {
   private score = 0
-  icon = PlayerState.DEFAULT
+  private _state = PlayerState.DEFAULT
+
+  public get icon() {
+    return this._state
+  }
+
+  public set state(value) {
+    this._state = value
+  }
+
+  public get state() {
+    return this._state
+  }
 
   playerNumber: number
-  isStunned = false
-  hasDiarrhea = false
+
+  public get isStunned() {
+    return this._state === PlayerState.STUNNED
+  }
+
+  public get hasDiarrhea() {
+    return this._state === PlayerState.DIARRHEA
+  }
   stunTimeout: number | null = null
   resetIconTimeout: number | null = null
-  dead = false
+
+  public get dead() {
+    return this._state === PlayerState.DEAD
+  }
+
+  public kill() {
+    this.justDied = true
+    this._state = PlayerState.DEAD
+  }
+
   justDied = false
+  isReady = false
 
   static createFilter(hue: number, sepia = 150): string {
     return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
@@ -82,7 +112,7 @@ export class Player extends Icon {
       ctx.font = `bold ${h / 2}px sans-serif`
       ctx.fillStyle = this.getColor()
       ctx.fillText(
-        `${this.getScore().toString()}🍌 ${this.getLives()}💗`,
+        this.getPlayerString(gameState.getState()),
         x,
         y - this.getDimensions()[1]
       )
@@ -90,11 +120,37 @@ export class Player extends Icon {
     // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
+  getPlayerStatusString(suffix: string) {
+    return `P${this.playerNumber + 1}${suffix}`
+  }
+
+  getPlayerString(gameState: GameState) {
+    switch (gameState.status) {
+      case GameStatus.RUNNING:
+        if (this.dead) {
+          return this.getPlayerStatusString(": dead")
+        }
+
+        return `${this.getScore().toString()}🍌 ${this.getLives()}💗`
+      case GameStatus.IDLE:
+        // Display whether the player is ready or not
+        return this.getPlayerStatusString(
+          ` ready: ${this.isReady ? "✔" : "❌"}`
+        )
+
+      default:
+        return ""
+    }
+  }
+
+  getPlayerScoreboardString(gameState: GameState) {
+    return this.getPlayerString(gameState)
+  }
+
   private inputDevice: InputDevice
   private hue = genHue()
 
   private lives: number = playerInitialLives
-  private isOnFire = false
   private primaryActionEquipable = new PoopGun(poopGunCoolDown)
   private secondaryActionEquipable = new NotAFlameThrower(2000)
 
@@ -110,9 +166,9 @@ export class Player extends Icon {
 
   eat(value: number) {
     playSFX("eat")
-    this.icon = PlayerState.EAT
+    this.state = PlayerState.EAT
     this.resetIconTimeout = window.setTimeout(() => {
-      this.icon = PlayerState.DEFAULT
+      this.state = PlayerState.DEFAULT
     }, 500)
     this.addToScore(value)
   }
@@ -145,29 +201,15 @@ export class Player extends Icon {
     return this.hue
   }
 
-  setOnFire() {
-    this.isOnFire = true
-  }
-
   stun() {
     playSFX("hit")
     this.damage(1, () => {
-      this.isStunned = true
-      this.icon = PlayerState.STUNNED
+      this.state = PlayerState.STUNNED
 
       this.stunTimeout = window.setTimeout(() => {
-        this.isStunned = false
-        this.icon = PlayerState.DEFAULT
+        this.state = PlayerState.DEFAULT
       }, playerStunDuration)
     })
-  }
-
-  extinguish() {
-    this.isOnFire = false
-  }
-
-  getIsOnFire() {
-    return this.isOnFire
   }
 
   getLives() {
@@ -184,10 +226,8 @@ export class Player extends Icon {
     if (newLives <= 0) {
       if (this.stunTimeout) window.clearTimeout(this.stunTimeout)
       if (this.resetIconTimeout) window.clearTimeout(this.resetIconTimeout)
-      this.dead = true
-      this.justDied = true
+      this.kill()
       this.lives = 0
-      this.icon = PlayerState.DEAD
     } else {
       this.lives = newLives
       callback()
