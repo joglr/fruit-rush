@@ -25,7 +25,7 @@ body {
   overflow: hidden;
 }
 
-#intro {
+#gameui {
   display: grid;
   place-items: center;
   position: absolute;
@@ -35,11 +35,11 @@ body {
 #debug {
   position: absolute;
   top: 0;
-  font-family: Consolas, 'Courier New', Courier, monospace;
+  font-family: Consolas, "Courier New", Courier, monospace;
   white-space: pre-wrap;
   z-index: 100;
   background-color: hsla(0, 0%, 0%, 0.5);
-  color:hsla(0, 0%, 50%, 1)
+  color: hsla(0, 0%, 50%, 1);
 }
 
 #scoreboard {
