@@ -26,7 +26,7 @@ import {
   GameStatus,
   players,
 } from "./modules/gameState"
-import { getWH } from "./modules/util"
+import { getPlayersAlive, getWH } from "./modules/util"
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const uiContainer = document.querySelector("#gameui")! as HTMLDivElement
@@ -206,7 +206,7 @@ function updateGameState(timeStamp: number, deltaT: number) {
 
       lastSecond = timeStamp
     }
-    const playersAlive = Array.from(players).filter((p) => !p.dead).length
+    const playersAlive = getPlayersAlive(players).length
 
     for (const p of players) {
       if (p.dead && p.justDied) {
