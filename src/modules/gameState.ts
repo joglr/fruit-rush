@@ -32,6 +32,8 @@ export function reset() {
     )
   )
   displaceables = new Set<Displaceable>()
+  players.forEach((p) => displaceables.add(p))
+  gameState.setState({ status: GameStatus.RUNNING })
 }
 
 export function createPlayer(inputDevice: InputDevice) {
