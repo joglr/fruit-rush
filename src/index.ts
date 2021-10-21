@@ -27,6 +27,7 @@ import {
   players,
 } from "./modules/gameState"
 import { getPlayersAlive, getWH } from "./modules/util"
+import { DEBUG } from "./modules/debug"
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const uiContainer = document.querySelector("#gameui")! as HTMLDivElement
@@ -36,8 +37,6 @@ const debugContainer = document.querySelector("#debug")!
 const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const ctx = canvas.getContext("2d")!
-
-const DEBUG = window.location.hash.includes("debug")
 
 // gameState.subscribe((s) => {
 //   switch (s.status) {
