@@ -1,6 +1,6 @@
 import { Displaceable } from "./Displaceable"
 import { InputDevice } from "./InputDevice"
-import { Player } from "./Player"
+import { Player, resetHue } from "./Player"
 import { State } from "./State"
 import { getWH } from "./util"
 
@@ -24,7 +24,7 @@ export let players: Set<Player> = new Set()
 export let displaceables: Set<Displaceable> = new Set()
 
 export function reset() {
-  // TODO: Change reset position
+  resetHue()
   gameState.reset()
   players = new Set(
     Array.from(players).map((player) =>
