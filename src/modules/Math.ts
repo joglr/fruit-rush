@@ -6,6 +6,12 @@ export function randomInRange(min: number, max: number) {
   return Math.random() * (max - min) + min
 }
 
+export function generateRandomPos(maxX: number, maxY: number) {
+  const x = randBetween(-maxX, maxX)
+  const y = randBetween(-maxY, maxY)
+  return new Vector2(x, y)
+}
+
 type AxisIndex = 0 | 1
 
 export enum Axis {
