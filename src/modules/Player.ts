@@ -17,6 +17,10 @@ import { GameState, gameState, GameStatus } from "./gameState"
 
 let currentHue = 0
 
+export const resetHue = () => {
+  currentHue = 0
+}
+
 function genHue(): number {
   const hue = currentHue
   currentHue += 45
