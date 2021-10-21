@@ -1,6 +1,6 @@
 import { Player } from "./Player"
 import { html } from "htm/preact"
-import { h, VNode } from "preact"
+import { FunctionComponent, h, VNode } from "preact"
 import { gameState, GameStatus, reset } from "./gameState"
 import { getPlayersAlive } from "./util"
 
@@ -10,15 +10,11 @@ export function getUI(
 ): VNode<Record<string, never>> {
   return html`<${Guide} status=${status} players=${players} />
     <div id="scoreboard">
-      ${Array.from(players).map((p) => {
-        return h(
-          "div",
-          {
-            style: `color: ${p.getColor()}`,
-          },
-          p.getPlayerScoreboardString(gameState.getState())
-        )
-      })}
+      ${Array.from(players).map(
+        (p) => html`<${PlayerColoredSpan} player=${p}>
+          ${p.getPlayerScoreboardString(gameState.getState())}
+        <//> `
+      )}
     </div>`
 }
 
@@ -54,13 +50,14 @@ function Guide({
         <p style="font-size: 60px;">Game over!</p>
         ${getPlayersAlive(players).length === 1
           ? html`<p>
-              The winner is:
-              ${getPlayersAlive(players)[0].getPlayerStatusString("")}
+              <${PlayerColoredSpan} player=${getPlayersAlive(players)[0]}>
+                ${getPlayersAlive(players)[0].getPlayerStatusString(" wins!")}
+              <//>
             </p>`
           : null}
         <button
           onclick=${reset}
-          style="margin: auto; padding: 8px; cursor: pointer;"
+          style="margin: 16px auto; padding: 8px; cursor: pointer;"
         >
           Restart game
         </button>
@@ -69,4 +66,14 @@ function Guide({
     default:
       return html`error`
   }
+}
+
+const PlayerColoredSpan: FunctionComponent<{ player: Player }> = (props) => {
+  return h(
+    "span",
+    {
+      style: `color: ${props.player.getColor()}`,
+    },
+    props.children
+  )
 }
