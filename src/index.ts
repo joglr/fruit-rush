@@ -8,23 +8,25 @@ import {
   playerJumpAmount,
 } from "./config"
 import { playSFX } from "./modules/sound"
-import { Displaceable } from "./modules/Displaceable"
 import { Poop } from "./modules/Equipables/PoopGun"
 import { Food } from "./modules/Food"
 import confetti from "canvas-confetti"
 // import State from './modules/State'
 // const state = State()
-import init, {
-  GamepadInput,
-  InputDevice,
-  KeyboardInput,
-} from "./modules/InputDevice"
+import init, { GamepadInput, KeyboardInput } from "./modules/InputDevice"
 import { randBetween, randomInRange, Vector2 } from "./modules/Math"
 import { Player } from "./modules/Player"
 import "./style.css"
 import { render } from "htm/preact"
 import { getUI } from "./modules/ui"
-import { gameState, GameStatus } from "./modules/gameState"
+import {
+  createPlayer,
+  displaceables,
+  gameState,
+  GameStatus,
+  players,
+} from "./modules/gameState"
+import { getWH } from "./modules/util"
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const uiContainer = document.querySelector("#gameui")! as HTMLDivElement
@@ -377,11 +379,8 @@ function updateGameState(timeStamp: number, deltaT: number) {
   }
 }
 
-const players: Set<Player> = new Set()
-const displaceables: Set<Displaceable> = new Set()
-
 init()
-// generateMap();
+
 lastAnimationFrameID = requestAnimationFrame(gameLoop)
 
 function celebrate() {
@@ -420,22 +419,4 @@ function celebrate() {
       },
     })
   }, 250)
-}
-
-function createPlayer(inputDevice: InputDevice) {
-  const player = new Player(
-    players.size,
-    inputDevice,
-    getWH().map((x) => x / 2) as [number, number]
-  )
-
-  players.add(player)
-  displaceables.add(player)
-
-  if (gameState.getState().status !== GameStatus.RUNNING)
-    gameState.setState({ status: GameStatus.RUNNING })
-}
-
-function getWH(): [number, number] {
-  return [window.innerWidth, window.innerHeight]
 }

@@ -164,6 +164,10 @@ export class Player extends Icon {
     this.inputDevice = inputDevice
   }
 
+  reset(position: [number, number]) {
+    return new Player(this.playerNumber, this.inputDevice, position)
+  }
+
   eat(value: number) {
     playSFX("eat")
     this.state = PlayerState.EAT
