@@ -1,7 +1,7 @@
 import { Player } from "./Player"
 import { html } from "htm/preact"
 import { h, VNode } from "preact"
-import { gameState, GameStatus } from "./gameState"
+import { gameState, GameStatus, reset } from "./gameState"
 
 export function getUI(
   players: Set<Player>,
@@ -51,6 +51,7 @@ function Guide({
         style="background-color: black; padding: 16px; font-size: 30px;"
       >
         Game over!
+        <button onclick=${reset}>Restart game</button>
       </div>`
     }
     default:
