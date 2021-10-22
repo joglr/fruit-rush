@@ -96,10 +96,11 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
 })
 
 let lastAnimationFrameID: number
-let lastFrameTime: number
+let lastFrameTime = 0
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
     cancelAnimationFrame(lastAnimationFrameID)
+    lastFrameTime = 0
     document.title += pausedText
   } else {
     requestAnimationFrame(gameLoop)
@@ -108,7 +109,7 @@ document.addEventListener("visibilitychange", () => {
 })
 
 function gameLoop(timeStamp: number) {
-  const deltaT = timeStamp - lastFrameTime
+  const deltaT = lastFrameTime === 0 ? 0 : timeStamp - lastFrameTime
   updateGameState(timeStamp, deltaT)
   drawUI(timeStamp, deltaT)
   drawFrame(timeStamp)
