@@ -15,7 +15,7 @@ const sounds = {
 const audios = Object.values(sounds).map((s) => {
   const a = document.createElement("audio")
   a.src = s
-  console.log(s)
+  a.preload = "auto"
 
   a.volume = 0.5
   return () => {
