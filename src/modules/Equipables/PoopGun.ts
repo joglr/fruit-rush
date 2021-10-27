@@ -28,14 +28,15 @@ export class PoopGun extends Equipable {
     if (v.isNullVector()) v = p.getV()
     if (v.isNullVector()) return // TODO: Save last velocity / move direction
 
-    const wv = v.setMagnitude(poopVelocity)
+    const wv = v.setMagnitude(poopVelocity + p.getV().getMagnitude())
+    const rv = v.setMagnitude(poopVelocity)
 
     // Recoil
     p.setVelocity(
       p
         .getV()
         .add(
-          wv
+          rv
             .flip()
             .multiply(poopRecoilMultiplier)
             .divide(FRAMERATE_MIGRATION_DURATION)
