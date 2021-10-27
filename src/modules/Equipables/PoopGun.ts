@@ -28,7 +28,7 @@ export class PoopGun extends Equipable {
     if (v.isNullVector()) v = p.getV()
     if (v.isNullVector()) return // TODO: Save last velocity / move direction
 
-    const wv = v.setMagnitude(poopVelocity + p.getV().getMagnitude())
+    const wv = v.setMagnitude(poopVelocity)
 
     // Recoil
     p.setVelocity(
