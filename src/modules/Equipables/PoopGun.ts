@@ -35,13 +35,9 @@ export class PoopGun extends Equipable {
     p.setVelocity(
       p
         .getV()
-        .add(
-          rv
-            .flip()
-            .multiply(poopRecoilMultiplier)
-            .divide(FRAMERATE_MIGRATION_DURATION)
-            .multiply(deltaT)
-        )
+        .add(rv.flip().multiply(poopRecoilMultiplier))
+        .divide(FRAMERATE_MIGRATION_DURATION)
+        .multiply(deltaT)
     )
 
     return new Poop(
