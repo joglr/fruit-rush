@@ -16,7 +16,7 @@ jobs:
     name: Assign to One Project
     steps:
       - name: Assign opened issues to Fruit Rush
-      - uses: alex-page/github-project-automation-plus@v0.8.1
+        uses: alex-page/github-project-automation-plus@v0.8.1
         if: github.event.issue && (github.event.action == 'opened' || github.event.action == 'unassigned')
         with:
           project: Fruit Rush
@@ -24,7 +24,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Assign issues with assignees and opened pull requests to Fruit Rush
-      - uses: alex-page/github-project-automation-plus@v0.8.1
+        uses: alex-page/github-project-automation-plus@v0.8.1
         if: (github.event.pull_request && github.event.action == 'opened' ) || (github.event.issue && github.event.action == 'assigned' )
         with:
           project: Fruit Rush
