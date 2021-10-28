@@ -20,3 +20,4 @@ jobs:
       if: github.event.action == 'opened'
       with:
         project: 'https://github.com/joglr/fruit-rush/projects/1'
+        column_name: 'Backlog'
