@@ -2,7 +2,7 @@ name: Auto Assign to Project
 
 on:
   issues:
-    types: [opened, labeled, assigned]
+    types: [opened, labeled, assigned, unassigned]
   pull_request:
     types: [opened, labeled]
   issue_comment:
