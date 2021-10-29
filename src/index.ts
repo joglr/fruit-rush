@@ -27,12 +27,12 @@ import {
   players,
 } from "./modules/gameState"
 import { getPlayersAlive, getWH } from "./modules/util"
-import { DEBUG } from "./modules/debug"
+import { DEBUG, loadGitMetadata } from "./modules/debug"
+
+loadGitMetadata()
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const uiContainer = document.querySelector("#gameui")! as HTMLDivElement
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const debugContainer = document.querySelector("#debug")!
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = document.querySelector("#gamecanvas")! as HTMLCanvasElement
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -118,49 +118,16 @@ function gameLoop(timeStamp: number) {
 }
 
 function drawUI(timeStamp: number, deltaT: number) {
-  if (DEBUG) {
-    debugContainer.textContent = `fps ${calcFPS(
+  render(
+    getUI(
+      timeStamp,
       lastFrameTime,
-      timeStamp
-    ).toFixed()}`
-    debugContainer.textContent += ` (Δt = ${deltaT.toFixed(3)})`
-  }
-
-  render(getUI(players, gameState.getState().status), uiContainer)
-
-  for (const p of players) {
-    const mv = p.getInputDevice().getMovementVector()
-    const mvs = mv.toArray().toString()
-
-    const threeDecimals = (x: number) => x.toFixed(3)
-    const av = p.getInputDevice().getAimVector().toArray().toString()
-    const pp = p.getP().toArray().map(threeDecimals).toString()
-    const pv = p.getV().toArray().map(threeDecimals).toString()
-    const pa = p.getA().toArray().map(threeDecimals).toString()
-
-    if (DEBUG)
-      debugContainer.innerHTML +=
-        "\n" +
-        `<div style="filter: ${Player.createFilter(p.getHue(), 300)}">${p.icon}
-  ${mvs} l: ${mv.getMagnitude()}
-  aim: ${av}
-  p: ${pp}
-  v: ${pv}
-  a: ${pa}
-  j: ${p.getInputDevice().getJumpButtonIsDown()}
-  s: ${p.isStunned}
-  d: ${p.hasDiarrhea}
-  health: ${p.getLives()}
-  </div>`
-  }
-
-  if (DEBUG)
-    debugContainer.innerHTML += `
-Entities: ${displaceables.size}`
-}
-
-function calcFPS(lastFrameTime: number, timestamp: number) {
-  return lastFrameTime === undefined ? 0 : 1000 / (timestamp - lastFrameTime)
+      deltaT,
+      players,
+      gameState.getState().status
+    ),
+    uiContainer
+  )
 }
 
 // Render

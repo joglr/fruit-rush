@@ -77,7 +77,7 @@ export class Player extends Icon {
   isReady = false
 
   static createFilter(hue: number, sepia = 150): string {
-    return `sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
+    return `filter: sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
   }
 
   draw(ctx: CanvasRenderingContext2D, timeStamp: number) {
@@ -124,7 +124,7 @@ export class Player extends Icon {
     // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
-  getPlayerStatusString(suffix: string) {
+  getPlayerStatusString(suffix = "") {
     return `P${this.playerNumber + 1}${suffix}`
   }
 

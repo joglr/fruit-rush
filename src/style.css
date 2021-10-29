@@ -34,12 +34,17 @@ body {
 
 #debug {
   position: absolute;
-  top: 0;
+  top: 5px;
+  left: 5px;
   font-family: Consolas, "Courier New", Courier, monospace;
   white-space: pre-wrap;
   z-index: 100;
   background-color: hsla(0, 0%, 0%, 0.5);
   color: hsla(0, 0%, 50%, 1);
+}
+
+#debug .player-info {
+  white-space: pre-wrap;
 }
 
 #scoreboard {
