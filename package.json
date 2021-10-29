@@ -10,7 +10,7 @@
     "test": "jest",
     "prebuild": "yarn test",
     "prepare": "husky install",
-    "zip": "mv dist fruit-rush && jszip-cli add --force fruit-rush/ > fruit-rush.zip"
+    "zip": "rm -rf fruit-rush && mv dist fruit-rush && jszip-cli add --force fruit-rush/ > fruit-rush.zip"
   },
   "repository": {
     "type": "git",
