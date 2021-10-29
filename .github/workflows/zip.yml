@@ -20,10 +20,12 @@ jobs:
 
       - name: Build
         run: |
-          yarn
+          yarn install --frozen-lockfile
           yarn build
+          mkdir artifact
+          mv dist artifact/fruit-rush
 
       - uses: actions/upload-artifact@v2
         with:
           name: Fruit Rush
-          path: dist
+          path: artifact/fruit-rush
