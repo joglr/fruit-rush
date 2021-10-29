@@ -16,9 +16,9 @@ export async function loadGitMetadata() {
     gitMetadata = json
   } else {
     gitMetadata = {
-      hash: "367a33c",
-      subject: "Attempt to fix permissions",
-      time: 1635444046000,
+      hash: "0000000",
+      subject: "N/A",
+      time: new Date().getTime(),
     }
   }
 }
