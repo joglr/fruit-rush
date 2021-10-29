@@ -7,7 +7,7 @@ on:
 
 jobs:
   tagged-release:
-    name: "Tagged Release"
+    name: Fruit Rush Release ${{ github.ref }}
     runs-on: "ubuntu-latest"
 
     steps:
