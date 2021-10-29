@@ -1,6 +1,30 @@
 import { InputDevice } from "./InputDevice"
 import { UnitVector2, Vector2 } from "./Math"
 
+export interface GitMetadata {
+  hash: string
+  subject: string
+  time: number
+}
+
+let gitMetadata: GitMetadata | null = null
+
+export async function loadGitMetadata() {
+  if (process.env.NODE_ENV !== "development") {
+    const r = await fetch("metadata.json")
+    const json = await r.json()
+    gitMetadata = json
+  } else {
+    gitMetadata = {
+      hash: "367a33c",
+      subject: "Attempt to fix permissions",
+      time: 1635444046000,
+    }
+  }
+}
+
+export const getGitMetadata = () => gitMetadata
+
 export class MockInput implements InputDevice {
   constructor() {
     if (process.env.NODE_ENV !== "development")

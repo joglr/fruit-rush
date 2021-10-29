@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && yarn metadata",
+    "metadata": "./metadata.sh",
     "serve": "vite preview",
     "test": "jest",
     "prebuild": "yarn test",
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/joglr/fruit-rush#readme",
   "dependencies": {
     "canvas-confetti": "^1.4.0",
+    "date-fns": "^2.25.0",
     "htm": "^3.1.0",
     "preact": "^10.5.15"
   },
