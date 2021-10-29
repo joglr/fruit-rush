@@ -156,7 +156,6 @@ export class Player extends Icon {
 
   private lives: number = playerInitialLives
   private primaryActionEquipable: Equipable = new PoopGun(poopGunRepeatRate)
-  // private secondaryActionEquipable
 
   setPrimaryActionEquipable(e: Equipable) {
     this.primaryActionEquipable = e
@@ -206,9 +205,6 @@ export class Player extends Icon {
   getPrimaryActionEquipable() {
     return this.primaryActionEquipable
   }
-  // getSecondaryActionEquipable() {
-  //   return this.secondaryActionEquipable
-  // }
   getHue(): number {
     return this.hue
   }

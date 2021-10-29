@@ -12,7 +12,6 @@ export interface InputDevice {
   hapticFeedback(): void
   getJumpButtonIsDown(): boolean
   getPrimaryActionButtonIsDown(): boolean
-  getSecondaryActionButtonIsDown(): boolean
 }
 
 let initialized = false
@@ -67,12 +66,6 @@ export class GamepadInput implements InputDevice {
   getJumpButtonIsDown(): boolean {
     return (
       navigator.getGamepads()[this.gamepadIndex]?.buttons[6].pressed === true
-    )
-  }
-
-  getSecondaryActionButtonIsDown(): boolean {
-    return (
-      navigator.getGamepads()[this.gamepadIndex]?.buttons[0].pressed === true
     )
   }
 }
@@ -171,7 +164,6 @@ export class KeyboardInput implements InputDevice {
   yNegAimKeys: Key[]
   jumpKey: Key[]
   primaryActionKey: Key[]
-  secondaryActionKey: Key[]
 
   constructor({
     xPos = [],
@@ -184,7 +176,6 @@ export class KeyboardInput implements InputDevice {
     yNegAim = [],
     jumpKey = [],
     primaryActionKey = [],
-    secondaryActionKey = [],
   }: {
     xPos?: Key[]
     xNeg?: Key[]
@@ -196,7 +187,6 @@ export class KeyboardInput implements InputDevice {
     yNegAim?: Key[]
     jumpKey?: Key[]
     primaryActionKey?: Key[]
-    secondaryActionKey?: Key[]
   }) {
     if (!initialized)
       throw new Error(
@@ -215,7 +205,6 @@ export class KeyboardInput implements InputDevice {
     this.yNegAimKeys = yNegAim
     this.jumpKey = jumpKey
     this.primaryActionKey = primaryActionKey
-    this.secondaryActionKey = secondaryActionKey
     this.allKeys = [
       ...this.xPosKeys,
       ...this.xNegKeys,
@@ -227,7 +216,6 @@ export class KeyboardInput implements InputDevice {
       ...this.yNegAimKeys,
       ...this.jumpKey,
       ...this.primaryActionKey,
-      ...this.secondaryActionKey,
     ]
   }
 
@@ -244,9 +232,6 @@ export class KeyboardInput implements InputDevice {
 
   getPrimaryActionButtonIsDown(): boolean {
     return KeyboardInput.keyIsDown(this.primaryActionKey)
-  }
-  getSecondaryActionButtonIsDown(): boolean {
-    return KeyboardInput.keyIsDown(this.secondaryActionKey)
   }
 
   getMovementVector(): Vector2 {

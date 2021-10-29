@@ -18,11 +18,7 @@ export class Diarrhea extends Equipable {
     const rv = v.setMagnitude(diarrheaVelocity)
 
     // Recoil
-    p.setVelocity(
-      p.getV().add(rv.flip().multiply(diarrheaRecoilMultiplier))
-      // .divide(FRAMERATE_MIGRATION_DURATION)
-      // .multiply(deltaT)
-    )
+    p.setVelocity(p.getV().add(rv.flip().multiply(diarrheaRecoilMultiplier)))
 
     return new Poop(
       p.getP().add(p.getDimensions().setDirection(v).multiply(1)).toArray(),

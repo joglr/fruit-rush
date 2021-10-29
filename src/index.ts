@@ -74,7 +74,6 @@ function keydownHandler() {
       yNegAim: ["arrowup"],
       jumpKey: [" "],
       primaryActionKey: ["shift"],
-      secondaryActionKey: ["control"],
     })
     createPlayer(inputDevice)
   }
@@ -227,17 +226,6 @@ function updateGameState(timeStamp: number, deltaT: number) {
             displaceables.add(thing)
           }
         }
-
-        // if (
-        //   p.getInputDevice().getSecondaryActionButtonIsDown() &&
-        //     (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-        // ) {
-        //   if (p.getSecondaryActionEquipable().canUse(timeStamp)) {
-        //     p.getInputDevice().hapticFeedback()
-        //     const thing = p.getSecondaryActionEquipable().use(p, timeStamp)
-        //     displaceables.add(thing)
-        //   }
-        // }
       }
     }
 
@@ -299,27 +287,6 @@ function updateGameState(timeStamp: number, deltaT: number) {
         ) {
           continue
         }
-        // // 💦 -> 🔥
-        // if (d instanceof Poop && op instanceof Fire) {
-        //   // Extinguish fire with water if they intersect
-        //   if (d.intersectsWith(op)) {
-        //     displaceables.delete(d)
-        //     displaceables.delete(op)
-        //     break
-        //   }
-        // }
-
-        // 🔥 -> 🐵
-        // if (d instanceof Fire && od instanceof Player) {
-        // Set player on fire if they intersect fire
-        // if (p.intersectsWith(op)) {
-        //   op.damage(Fire.impactDamage);
-        //   if (!op.getIsOnFire()) {
-        //     op.setOnFire();
-        //     break;
-        //   }
-        // }
-        // }
 
         // 💩 -> 🐵
         if (d instanceof Poop && od instanceof Player) {

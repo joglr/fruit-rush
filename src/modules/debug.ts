@@ -48,9 +48,6 @@ export class MockInput implements InputDevice {
   getPrimaryActionButtonIsDown(): boolean {
     return false
   }
-  getSecondaryActionButtonIsDown(): boolean {
-    return false
-  }
 }
 
 export const DEBUG = window.location.hash.includes("debug")
