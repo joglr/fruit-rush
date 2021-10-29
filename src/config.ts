@@ -7,8 +7,10 @@ export const pausedText = " (Paused)"
 export const gravityAmount = 0.3
 export const poopVelocity = 5
 export const poopRecoilMultiplier = 2.0
-export const poopGunCoolDown = 800
-export const diarrheaRecoilMultiplier = 0.5
+export const poopGunRepeatRate = 800
+export const diarrheaVelocity = 1
+export const diarrheaRepeatRate = 1000 / 10
+export const diarrheaRecoilMultiplier = 2 * (diarrheaRepeatRate / (1000 / 4))
 export const playerStunDuration = 1000
 
 export const playerJumpAmount = -10
@@ -22,7 +24,7 @@ export const playerCoolDownIndicatorOffset = 1 / 4
 export const playerInitialLives = 10
 export const fruitMargin = 50
 export const tacoDamage = 1
-export const tacoEffectDuration = 2000
+export const tacoEffectDuration = 5000
 
 export const FRAMERATE_MIGRATION_DURATION = 1000 / 60
 export const fruitSpawnIntervalMilliseconds = 1000

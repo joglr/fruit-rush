@@ -10,10 +10,6 @@ import {
 import { playSFX } from "../sound"
 
 export class PoopGun extends Equipable {
-  constructor(repeatRate: number) {
-    super(repeatRate)
-  }
-
   use(
     p: Player,
     currentTime: number,

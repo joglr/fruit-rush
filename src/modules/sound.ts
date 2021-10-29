@@ -3,6 +3,7 @@ import hit from "./../../sounds/hit.wav"
 import shoot from "./../../sounds/shoot.wav"
 import eat from "./../../sounds/eat.wav"
 import eat_bad from "./../../sounds/eat_bad.wav"
+import diarrhea from "./../../sounds/diarrhea.wav"
 // import kebab from "./../../sounds/kebab.mp3"
 const sounds = {
   jump,
@@ -10,6 +11,7 @@ const sounds = {
   shoot,
   eat,
   eat_bad,
+  diarrhea,
   // "kebab,
 }
 const audios = Object.values(sounds).map((s) => {
