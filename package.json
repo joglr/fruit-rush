@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && yarn metadata",
-    "metadata": "git log -n 1 --p retty=format:\"{ \\\"hash\\\": \\\"%h\\\", \\\"subject\\\": \\\"%s\\\", \\\"time\\\": %ct000 }\" > dist/metadata.json",
+    "metadata": "git log -n 1 --pretty=format:\"{ \\\"hash\\\": \\\"%h\\\", \\\"subject\\\": \\\"%s\\\", \\\"time\\\": %ct000 }\" > dist/metadata.json",
     "serve": "vite preview",
     "test": "jest",
     "prebuild": "yarn test",
