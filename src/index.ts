@@ -15,7 +15,7 @@ import confetti from "canvas-confetti"
 // const state = State()
 import init, { GamepadInput, KeyboardInput } from "./modules/InputDevice"
 import { randBetween, randomInRange, Vector2 } from "./modules/Math"
-import { Player } from "./modules/Player"
+import { Player, PlayerState } from "./modules/Player"
 import "./style.css"
 import { render } from "htm/preact"
 import { getUI } from "./modules/ui"
@@ -194,12 +194,6 @@ function updateGameState(timeStamp: number, deltaT: number) {
         }
       }
 
-      const positiveAimVector: [number, number] = p
-        .getInputDevice()
-        .getAimVector()
-        .toPositiveVector()
-        .toArray()
-
       // Player actions
 
       if (!p.dead) {
@@ -224,8 +218,9 @@ function updateGameState(timeStamp: number, deltaT: number) {
         }
 
         if (
-          p.getInputDevice().getPrimaryActionButtonIsDown()
+          p.getInputDevice().getPrimaryActionButtonIsDown() ||
           //  && (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+          p.state === PlayerState.DIARRHEA
         ) {
           const thing = p.getPrimaryActionEquipable().use(p, timeStamp, deltaT)
           if (thing) {
@@ -233,16 +228,16 @@ function updateGameState(timeStamp: number, deltaT: number) {
           }
         }
 
-        if (
-          p.getInputDevice().getSecondaryActionButtonIsDown() &&
-          (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
-        ) {
-          if (p.getSecondaryActionEquipable().canUse(timeStamp)) {
-            p.getInputDevice().hapticFeedback()
-            const thing = p.getSecondaryActionEquipable().use(p, timeStamp)
-            displaceables.add(thing)
-          }
-        }
+        // if (
+        //   p.getInputDevice().getSecondaryActionButtonIsDown() &&
+        //     (positiveAimVector[0] > 0 || positiveAimVector[1] > 0)
+        // ) {
+        //   if (p.getSecondaryActionEquipable().canUse(timeStamp)) {
+        //     p.getInputDevice().hapticFeedback()
+        //     const thing = p.getSecondaryActionEquipable().use(p, timeStamp)
+        //     displaceables.add(thing)
+        //   }
+        // }
       }
     }
 
@@ -297,7 +292,11 @@ function updateGameState(timeStamp: number, deltaT: number) {
         }
       }
       for (const od of displaceables) {
-        if (od instanceof Player && od.dead) {
+        if (
+          od instanceof Player &&
+          od.state !== PlayerState.DEFAULT &&
+          od.state !== PlayerState.EAT
+        ) {
           continue
         }
         // // 💦 -> 🔥
@@ -325,7 +324,7 @@ function updateGameState(timeStamp: number, deltaT: number) {
         // 💩 -> 🐵
         if (d instanceof Poop && od instanceof Player) {
           // Stun player if they intersect with poop
-          if (d.intersectsWith(od) && !od.isStunned) {
+          if (d.intersectsWith(od)) {
             od.stun()
             displaceables.delete(d)
             break

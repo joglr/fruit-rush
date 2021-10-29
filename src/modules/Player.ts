@@ -1,6 +1,5 @@
 import { InputDevice } from "./InputDevice"
 import { PoopGun } from "./Equipables/PoopGun"
-import { NotAFlameThrower } from "./Equipables/NotAFlameThrower"
 import { Icon } from "./Icon"
 import { Axis } from "./Math"
 import {
@@ -10,10 +9,11 @@ import {
   playerMinHorizontalVelocity,
   playerStunDuration,
   playerTurnStrength,
-  poopGunCoolDown,
+  poopGunRepeatRate,
 } from "../config"
 import { playSFX } from "./sound"
 import { GameState, gameState, GameStatus } from "./gameState"
+import { Equipable } from "./Equipable"
 
 let currentHue = 0
 
@@ -155,8 +155,12 @@ export class Player extends Icon {
   private hue = genHue()
 
   private lives: number = playerInitialLives
-  private primaryActionEquipable = new PoopGun(poopGunCoolDown)
-  private secondaryActionEquipable = new NotAFlameThrower(2000)
+  private primaryActionEquipable: Equipable = new PoopGun(poopGunRepeatRate)
+  // private secondaryActionEquipable
+
+  setPrimaryActionEquipable(e: Equipable) {
+    this.primaryActionEquipable = e
+  }
 
   constructor(
     playerNumber: number,
@@ -202,9 +206,9 @@ export class Player extends Icon {
   getPrimaryActionEquipable() {
     return this.primaryActionEquipable
   }
-  getSecondaryActionEquipable() {
-    return this.secondaryActionEquipable
-  }
+  // getSecondaryActionEquipable() {
+  //   return this.secondaryActionEquipable
+  // }
   getHue(): number {
     return this.hue
   }

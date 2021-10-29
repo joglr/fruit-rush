@@ -1,3 +1,4 @@
+import { Displaceable } from "./Displaceable"
 import { limit } from "./Math"
 import { Player } from "./Player"
 
@@ -20,5 +21,9 @@ export abstract class Equipable {
   canUse(currentTime: number): boolean {
     return currentTime > this.lastUsed + this.repeatRate
   }
-  abstract use(player: Player, currentTime: number, deltaT: number): unknown
+  abstract use(
+    player: Player,
+    currentTime: number,
+    deltaT: number
+  ): Displaceable | void
 }
