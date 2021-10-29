@@ -248,6 +248,7 @@ export class Player extends Icon {
 
   update(deltaT: number) {
     if (this.isStunned) return
+    const limitMultiplier = this.state === PlayerState.DIARRHEA ? 0.2 : 1
     const velocityChange = this.getInputDevice()
       .getMovementVector()
       .multiply(playerTurnStrength)
@@ -257,8 +258,8 @@ export class Player extends Icon {
     super.update(deltaT)
 
     this.v = this.v.limitAxis(
-      playerMinHorizontalVelocity,
-      playerMaxHorizontalVelocity,
+      playerMinHorizontalVelocity * limitMultiplier,
+      playerMaxHorizontalVelocity * limitMultiplier,
       Axis.X
     )
   }
