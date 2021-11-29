@@ -113,7 +113,7 @@ export class Player extends Icon {
     const [x, y] = this.getPosition()
     if (!this.dead) {
       const [, h] = this.dimensions
-      ctx.font = `bold ${h / 2}px sans-serif`
+      ctx.font = `${h / 2}px sans-serif`
       ctx.fillStyle = this.getColor()
       ctx.fillText(
         this.getPlayerString(gameState.getState()),
