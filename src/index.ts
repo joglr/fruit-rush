@@ -1,7 +1,6 @@
 import {
   FRAMERATE_MIGRATION_DURATION,
   fruitMargin,
-  fruitSpawnIntervalMilliseconds,
   gravityAmount,
   maxDisplaceables,
   pausedText,
@@ -26,7 +25,7 @@ import {
   GameStatus,
   players,
 } from "./modules/gameState"
-import { getPlayersAlive, getWH } from "./modules/util"
+import { getFoodSpawnRate, getPlayersAlive, getWH } from "./modules/util"
 import { DEBUG, loadGitMetadata } from "./modules/debug"
 
 loadGitMetadata()
@@ -149,7 +148,7 @@ let lastFruitSpawn = 0
 function updateGameState(timeStamp: number, deltaT: number) {
   if (gameState.getState().status === GameStatus.RUNNING) {
     if (
-      timeStamp - lastFruitSpawn > fruitSpawnIntervalMilliseconds &&
+      timeStamp - lastFruitSpawn > getFoodSpawnRate(players.size) &&
       displaceables.size < maxDisplaceables &&
       players.size > 0
     ) {
