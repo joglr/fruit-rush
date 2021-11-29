@@ -1,3 +1,4 @@
+import { fruitSpawnIntervalMilliseconds } from "../config"
 import { Player } from "./Player"
 
 export function getWH(): [number, number] {
@@ -10,4 +11,8 @@ export function getPlayersAlive(players: Set<Player>) {
 
 export function calcFPS(lastFrameTime: number, timestamp: number) {
   return lastFrameTime === undefined ? 0 : 1000 / (timestamp - lastFrameTime)
+}
+
+export function getFoodSpawnRate(players: number) {
+  return fruitSpawnIntervalMilliseconds / (0.5 + players / 2)
 }

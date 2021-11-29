@@ -2,7 +2,7 @@ import { Player } from "./Player"
 import { html } from "htm/preact"
 import { FunctionComponent, h, VNode } from "preact"
 import { displaceables, gameState, GameStatus, reset } from "./gameState"
-import { calcFPS, getPlayersAlive } from "./util"
+import { calcFPS, getFoodSpawnRate, getPlayersAlive } from "./util"
 import { DEBUG, getGitMetadata, GitMetadata } from "./debug"
 import { formatDistance, formatISO9075 } from "date-fns"
 
@@ -55,7 +55,8 @@ function Debug({ players, timeStamp, lastFrameTime, deltaT }: DebugProps) {
         ? html`<${Metadata} metadata=${metadata} />`
         : null}
     </div>
-    Entities: ${displaceables.size}
+    FoodSpawnRate: ${getFoodSpawnRate(players.size)} Entities:
+    ${displaceables.size}
     ${Array.from(players).map((p) => {
       const mv = p.getInputDevice().getMovementVector()
       const mvs = mv.toArray()[0].toString()
