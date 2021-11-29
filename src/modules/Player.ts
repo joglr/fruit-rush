@@ -15,18 +15,6 @@ import { playSFX } from "./sound"
 import { GameState, gameState, GameStatus } from "./gameState"
 import { Equipable } from "./Equipable"
 
-let currentHue = 0
-
-export const resetHue = () => {
-  currentHue = 0
-}
-
-function genHue(): number {
-  const hue = currentHue
-  currentHue += 45
-  return hue
-}
-
 export enum PlayerState {
   DEFAULT = "🐵",
   STUNNED = "🙈",
@@ -76,18 +64,12 @@ export class Player extends Icon {
   justDied = false
   isReady = false
 
-  static createFilter(hue: number, sepia = 150): string {
-    return `filter: sepia(${sepia}%) saturate(300%) hue-rotate(${hue}deg) brightness(0.8)`
-  }
-
   draw(ctx: CanvasRenderingContext2D, timeStamp: number) {
     super.draw(ctx, timeStamp)
     const progress = this.getPrimaryActionEquipable().getProgress(timeStamp)
 
     if (progress < 1 && progress > 0) {
       // ctx.beginPath()
-      // ctx.fillStyle = `hsla(${this.getHue()}, 50%, 50%, 0.5)`
-
       // const center = this.getP().subtract(this.getDimensions().divide(1.5)).toArray()
       // const rotation = -Math.PI / 2
       // const start = -2 * Math.PI * (1 - progress)
@@ -152,7 +134,7 @@ export class Player extends Icon {
   }
 
   private inputDevice: InputDevice
-  private hue = genHue()
+  private color: string
 
   private lives: number = playerInitialLives
   private primaryActionEquipable: Equipable = new PoopGun(poopGunRepeatRate)
@@ -164,15 +146,17 @@ export class Player extends Icon {
   constructor(
     playerNumber: number,
     inputDevice: InputDevice,
-    position: [number, number]
+    position: [number, number],
+    color: string
   ) {
     super(position)
     this.playerNumber = playerNumber
     this.inputDevice = inputDevice
+    this.color = color
   }
 
   reset(position: [number, number]) {
-    return new Player(this.playerNumber, this.inputDevice, position)
+    return new Player(this.playerNumber, this.inputDevice, position, this.color)
   }
 
   eat(value: number) {
@@ -195,18 +179,14 @@ export class Player extends Icon {
     return this.score
   }
 
-  getColor() {
-    return `hsl(${this.hue} 50% 50%)`
-  }
-
   getInputDevice() {
     return this.inputDevice
   }
   getPrimaryActionEquipable() {
     return this.primaryActionEquipable
   }
-  getHue(): number {
-    return this.hue
+  getColor(): string {
+    return this.color
   }
 
   stun() {

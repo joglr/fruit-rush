@@ -1,6 +1,6 @@
 import { Displaceable } from "./Displaceable"
 import { InputDevice } from "./InputDevice"
-import { Player, resetHue } from "./Player"
+import { Player } from "./Player"
 import { State } from "./State"
 import { getWH } from "./util"
 
@@ -24,7 +24,6 @@ export let players: Set<Player> = new Set()
 export let displaceables: Set<Displaceable> = new Set()
 
 export function reset() {
-  resetHue()
   gameState.reset()
   players = new Set(
     Array.from(players).map((player) =>
@@ -36,11 +35,16 @@ export function reset() {
   gameState.setState({ status: GameStatus.RUNNING })
 }
 
+const playerColors = ["#4e87f2", "#3ade52", "#f3b43f", "#ed05ca"]
+
 export function createPlayer(inputDevice: InputDevice) {
+  if (players.size === playerColors.length) return
+
   const player = new Player(
     players.size,
     inputDevice,
-    getWH().map((x) => x / 2) as [number, number]
+    getWH().map((x) => x / 2) as [number, number],
+    playerColors[players.size]
   )
 
   players.add(player)
@@ -49,4 +53,6 @@ export function createPlayer(inputDevice: InputDevice) {
   // TODO: Game should not start immediately when players connect
   if (gameState.getState().status !== GameStatus.RUNNING)
     gameState.setState({ status: GameStatus.RUNNING })
+
+  return player
 }
