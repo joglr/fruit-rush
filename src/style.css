@@ -32,6 +32,10 @@ body {
   inset: 0;
 }
 
+span {
+  font-weight: normal;
+}
+
 #debug {
   position: absolute;
   top: 5px;
