@@ -126,6 +126,34 @@ export class Vector2 {
     return this.setAxis(limit(min, max, this[axisIndex]), axis)
   }
 
+  dotProduct(v: Vector2) {
+    const [x1, y1] = this
+    const [x2, y2] = v
+    return x1 * x2 + y1 * y2
+  }
+
+  crossProduct(v: Vector2) {
+    const [x1, y1] = this
+    const [x2, y2] = v
+    return x1 * y2 - y1 * x2
+  }
+
+  static fromAngle(angle: number) {
+    return new Vector2(Math.cos(angle), Math.sin(angle))
+  }
+
+  static fromAngleAndMagnitude(angle: number, magnitude: number) {
+    return Vector2.fromAngle(angle).multiply(magnitude)
+  }
+
+  det(v: Vector2) {
+    return this[0] * v[1] - this[1] * v[0]
+  }
+
+  getAngle() {
+    return Math.atan2(this[1], this[0])
+  }
+
   getMagnitudeSquared(): number {
     const [x, y] = this.toArray()
     return x ** 2 + y ** 2
