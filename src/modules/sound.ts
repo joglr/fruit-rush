@@ -19,7 +19,7 @@ const audios = Object.values(sounds).map((s) => {
   a.src = s
   a.preload = "auto"
 
-  a.volume = 0.5
+  a.volume = 0.25
   return () => {
     a.pause()
     a.currentTime = 0
