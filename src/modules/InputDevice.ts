@@ -21,7 +21,9 @@ export class GamepadInput implements InputDevice {
   gamepadIndex: number
   getMovementVector(): UnitVector2 {
     const gp = navigator.getGamepads()[this.gamepadIndex]
-    if (!gp) throw new Error("TODO: Handle gamepad disconnected")
+    if (!gp) {
+      throw new Error("Gamepad disconnected, but input device still exists")
+    }
     const x = gp.axes[0]
     const y = gp.axes[1]
     return new UnitVector2(normalizeToDeadZone(x), normalizeToDeadZone(y))

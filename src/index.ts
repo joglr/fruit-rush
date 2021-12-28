@@ -91,6 +91,16 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
       players.delete(p)
     }
   }
+
+  for (const d of displaceables) {
+    if (d instanceof Player) {
+      const p = d
+      const gp = p.getInputDevice() as GamepadInput
+      if (gp.getGamepadIndex() === e.gamepad.index) {
+        displaceables.delete(p)
+      }
+    }
+  }
 })
 
 let lastAnimationFrameID: number
