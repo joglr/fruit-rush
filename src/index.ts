@@ -131,7 +131,7 @@ function drawUI(timeStamp: number, deltaT: number) {
 // Render
 
 function drawFrame(timeStamp: number) {
-  ctx.fillStyle = "#000"
+  ctx.fillStyle = "hsl(100, 30%, 20%)"
   ctx.fillRect(0, 0, ...getWH())
 
   for (const d of displaceables) {
