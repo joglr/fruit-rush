@@ -62,7 +62,13 @@ resizeHandler()
 window.addEventListener("resize", resizeHandler)
 
 function keydownHandler(e: KeyboardEvent) {
-  if (e.key === "Escape") {
+  if (e.key === "Enter" || e.key.toUpperCase() === "P") {
+    if (lastAnimationFrameID === null) {
+      continueGame()
+    } else {
+      pauseGame()
+    }
+  } else if (e.key === "Escape") {
     // debugger
     for (const p of players) {
       if (p.getInputDevice() instanceof KeyboardInput) {
@@ -106,18 +112,29 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
   }
 })
 
-let lastAnimationFrameID: number
+let lastAnimationFrameID: number | null = null
 let lastFrameTime = 0
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
-    cancelAnimationFrame(lastAnimationFrameID)
-    lastFrameTime = 0
-    document.title += pausedText
+    pauseGame()
   } else {
-    requestAnimationFrame(gameLoop)
-    document.title = document.title.replace(pausedText, "")
+    continueGame()
   }
 })
+
+function continueGame() {
+  lastAnimationFrameID = requestAnimationFrame(gameLoop)
+  document.title = document.title.replace(pausedText, "")
+}
+
+function pauseGame() {
+  if (lastAnimationFrameID !== null) {
+    cancelAnimationFrame(lastAnimationFrameID)
+    lastAnimationFrameID = null
+    lastFrameTime = 0
+    document.title += pausedText
+  }
+}
 
 function gameLoop(timeStamp: number) {
   const deltaT = lastFrameTime === 0 ? 0 : timeStamp - lastFrameTime
