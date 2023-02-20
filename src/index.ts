@@ -12,7 +12,11 @@ import { Food } from "./modules/Food"
 import confetti from "canvas-confetti"
 // import State from './modules/State'
 // const state = State()
-import init, { GamepadInput, KeyboardInput } from "./modules/InputDevice"
+import init, {
+  GamepadInput,
+  KeyboardInput,
+  keyboardInputInstance,
+} from "./modules/InputDevice"
 import { randBetween, randomInRange, Vector2 } from "./modules/Math"
 import { Player, PlayerState } from "./modules/Player"
 import "./style.css"
@@ -57,11 +61,18 @@ function resizeHandler() {
 resizeHandler()
 window.addEventListener("resize", resizeHandler)
 
-let keyboardPlayerActive = false
-
-function keydownHandler() {
-  if (!keyboardPlayerActive) {
-    keyboardPlayerActive = true
+function keydownHandler(e: KeyboardEvent) {
+  if (e.key === "Escape") {
+    // debugger
+    for (const p of players) {
+      if (p.getInputDevice() instanceof KeyboardInput) {
+        p.destroy()
+        players.delete(p)
+        displaceables.delete(p)
+        break
+      }
+    }
+  } else if (!keyboardInputInstance) {
     const inputDevice = new KeyboardInput({
       xPos: ["d"],
       xNeg: ["a"],
@@ -88,17 +99,9 @@ window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
   for (const p of players) {
     const gp = p.getInputDevice() as GamepadInput
     if (gp.getGamepadIndex() === e.gamepad.index) {
+      p.destroy()
       players.delete(p)
-    }
-  }
-
-  for (const d of displaceables) {
-    if (d instanceof Player) {
-      const p = d
-      const gp = p.getInputDevice() as GamepadInput
-      if (gp.getGamepadIndex() === e.gamepad.index) {
-        displaceables.delete(p)
-      }
+      displaceables.delete(p)
     }
   }
 })

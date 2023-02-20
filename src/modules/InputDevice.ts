@@ -12,10 +12,11 @@ export interface InputDevice {
   hapticFeedback(): void
   getJumpButtonIsDown(): boolean
   getPrimaryActionButtonIsDown(): boolean
+  destroy(): void
 }
 
 let initialized = false
-let keyboardInputInstance: KeyboardInput | null = null
+export let keyboardInputInstance: KeyboardInput | null = null
 
 export class GamepadInput implements InputDevice {
   gamepadIndex: number
@@ -35,6 +36,9 @@ export class GamepadInput implements InputDevice {
 
   constructor(gamepadIndex: number) {
     this.gamepadIndex = gamepadIndex
+  }
+  destroy(): void {
+    // Do nothing
   }
   hapticFeedback(): void {
     const gamepads = navigator?.getGamepads()
@@ -219,6 +223,9 @@ export class KeyboardInput implements InputDevice {
       ...this.jumpKey,
       ...this.primaryActionKey,
     ]
+  }
+  destroy(): void {
+    keyboardInputInstance = null
   }
 
   hasKey(key: Key) {
