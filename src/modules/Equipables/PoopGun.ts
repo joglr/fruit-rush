@@ -44,5 +44,5 @@ export class PoopGun extends Equipable {
 }
 
 export class Poop extends Icon {
-  icon = "💩"
+  icon = "📦"
 }

@@ -57,23 +57,8 @@ const foodMap = window.location.hash.includes("tacofest")
       "🌮": { size: [10, 10], points: 1, effect: tacoEffect },
     }
   : {
-      "🍌": { size: [13, 13], points: 1, effect: defaultEffect },
-      "🍎": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍏": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍇": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍈": { size: [17, 17], points: 1, effect: defaultEffect },
-      "🍉": { size: [17, 17], points: 1, effect: defaultEffect },
-      "🍊": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍍": { size: [20, 20], points: 1, effect: defaultEffect },
-      "🍑": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍒": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍓": { size: [8, 8], points: 1, effect: defaultEffect },
-      "🥑": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🥝": { size: [9, 9], points: 1, effect: defaultEffect },
-      "🍋": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🍐": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🥭": { size: [10, 10], points: 1, effect: defaultEffect },
-      "🌮": { size: [10, 10], points: 1, effect: tacoEffect },
+      "🛢️": { size: [13, 13], points: 1, effect: defaultEffect },
+      "🍌": { size: [13, 13], points: 1, effect: tacoEffect },
     }
 
 export class Food extends Icon {

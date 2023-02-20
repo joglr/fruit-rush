@@ -112,7 +112,7 @@ function Guide({
       if (players.size == 0) {
         return html`
           <div id="intro">
-            <h1>Fruit Rush <span>🐒🍉</span></h1>
+            <h1>Truck Rush <span>🚛📦</span></h1>
             <title id="helptext">Press any button / key to join the game!</h2>
             <p><span>🎮</span> or <span>⌨</span></p>
             <b>Controls:</b>

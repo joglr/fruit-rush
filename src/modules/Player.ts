@@ -29,7 +29,7 @@ export class Player extends Icon {
   private _state = PlayerState.DEFAULT
 
   public get icon() {
-    return this._state
+    return "🚛"
   }
 
   public set state(value) {
@@ -117,7 +117,7 @@ export class Player extends Icon {
           return this.getPlayerStatusString(": dead")
         }
 
-        return `${this.getScore().toString()}🍌 ${this.getLives()}💗`
+        return `${this.getScore().toString()}📦 ${this.getLives()}🚛`
       case GameStatus.IDLE:
         // Display whether the player is ready or not
         return this.getPlayerStatusString(
