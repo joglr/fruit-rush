@@ -32,6 +32,9 @@ export class MockInput implements InputDevice {
         "MockInput should not be used in produciton. Development purposes only"
       )
   }
+  destroy(): void {
+    // Do nothing
+  }
 
   getMovementVector(): UnitVector2 {
     return Vector2.NullVector
@@ -40,7 +43,7 @@ export class MockInput implements InputDevice {
     return Vector2.NullVector
   }
   hapticFeedback(): void {
-    console
+    // Do nothing
   }
   getJumpButtonIsDown(): boolean {
     return false

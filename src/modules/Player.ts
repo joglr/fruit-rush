@@ -159,6 +159,10 @@ export class Player extends Icon {
     return new Player(this.playerNumber, this.inputDevice, position, this.color)
   }
 
+  destroy() {
+    this.inputDevice.destroy()
+  }
+
   eat(value: number) {
     playSFX("eat")
     this.state = PlayerState.EAT
