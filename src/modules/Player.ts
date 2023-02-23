@@ -10,6 +10,8 @@ import {
   playerStunDuration,
   playerTurnStrength,
   poopGunRepeatRate,
+  aimIndicatorBeginningDistance,
+  aimIndicatorEndDistance,
 } from "../config"
 import { playSFX } from "./sound"
 import { GameState, gameState, GameStatus } from "./gameState"
@@ -69,6 +71,7 @@ export class Player extends Icon {
     const progress = this.getPrimaryActionEquipable().getProgress(timeStamp)
 
     if (progress < 1 && progress > 0) {
+      // Circular progress indicator
       // ctx.beginPath()
       // const center = this.getP().subtract(this.getDimensions().divide(1.5)).toArray()
       // const rotation = -Math.PI / 2
@@ -102,27 +105,48 @@ export class Player extends Icon {
         x,
         y - this.getDimensions()[1]
       )
+
+      if (this.hasDiarrhea) return
+
+      const [aimX0, aimY0] = this.inputDevice
+        .getAimVector()
+        .multiply(aimIndicatorBeginningDistance)
+        .add(this.getP())
+
+      const [aimX, aimY] = this.inputDevice
+        .getAimVector()
+        .multiply(aimIndicatorEndDistance)
+        .add(this.getP())
+        .toArray()
+
+      ctx.lineWidth = 4
+      ctx.strokeStyle = this.getColor()
+      ctx.beginPath()
+      ctx.moveTo(aimX0, aimY0)
+      ctx.lineTo(aimX, aimY)
+      ctx.stroke()
     }
     // ctx.fillText((this.playerNumber + 1).toString(), x, y - this.getDimensions()[1] - playerIndicatorOffset)
   }
 
   getPlayerStatusString(suffix = "") {
-    return `P${this.playerNumber + 1}${suffix}`
+    return suffix
+    return `P: ${this.playerNumber + 1}${suffix}`
   }
 
   getPlayerString(gameState: GameState) {
     switch (gameState.status) {
       case GameStatus.RUNNING:
         if (this.dead) {
-          return this.getPlayerStatusString(": dead")
+          return this.getPlayerStatusString("Dead")
         }
 
-        return `${this.getScore().toString()}🍌 ${this.getLives()}💗`
+        return this.getPlayerStatusString(
+          `${this.getScore().toString()}🍌 ${this.getLives()}💗`
+        )
       case GameStatus.IDLE:
         // Display whether the player is ready or not
-        return this.getPlayerStatusString(
-          ` ready: ${this.isReady ? "✔" : "❌"}`
-        )
+        return this.getPlayerStatusString(`Ready: ${this.isReady ? "✔" : "❌"}`)
 
       default:
         return ""

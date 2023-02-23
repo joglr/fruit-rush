@@ -20,6 +20,7 @@ export abstract class Displaceable extends Box {
   drawWithHitBox(ctx: CanvasRenderingContext2D, timeStamp: number) {
     this.draw(ctx, timeStamp)
     ctx.strokeStyle = this.getColor()
+    ctx.lineWidth = 1
     const halfSize = this.getDimensions().multiply(0.5)
     const orig = this.p.subtract(halfSize)
     ctx.strokeRect(...orig.toArray(), ...this.getDimensions().toArray())
